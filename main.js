@@ -1,12 +1,20 @@
 const { app, BrowserWindow, dialog, ipcMain, session } = require('electron');
 const path = require('path');
 const os = require('os');
+
+const contextMenu = require('electron-context-menu');
+const electronDl = require('electron-dl');
+
 const events = require('./src/events');
 const downloadManager = require('./src/downloadManager');
-const electronDl = require('electron-dl');
 const { readFavesFile } = require('./src/fileUtils');
 
 electronDl();
+
+contextMenu({
+  showSaveImageAs: true,
+  showCopyLink: true,
+});
 
 let toolsWindow;
 let webWindow;
