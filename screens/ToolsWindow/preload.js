@@ -15,7 +15,6 @@ contextBridge.exposeInMainWorld('on', {
     return ipcRenderer.invoke(events.DOWNLOAD_FAVES_CLICKED);
   },
   twitterLoginClicked: () => {
-    console.log('on.twitterLoginClicked');
-    return ipcRenderer.invoke(events.TWITTER_LOGIN_CLICKED);
+    return ipcRenderer.invoke(events.OPEN_TWITTER_WINDOW_CLICKED);
   },
 });

@@ -14,6 +14,14 @@ electronDl();
 contextMenu({
   showSaveImageAs: true,
   showCopyLink: true,
+  append: (defaultActions, parameters, browserWindow) => [
+    {
+      label: 'Scroll to bottom',
+      // Only show it when right-clicking text
+      visible: browserWindow?.id === webWindow?.id,
+      click: () => {},
+    },
+  ],
 });
 
 let toolsWindow;
@@ -57,25 +65,37 @@ const setupHandlers = (toolsWindow) => {
     });
   });
 
-  ipcMain.handle(events.TWITTER_LOGIN_CLICKED, async () => {
-    console.log(events.TWITTER_LOGIN_CLICKED);
-    const twitterLoginWindow = new BrowserWindow({
-      width: 800,
-      height: 900,
-      title: 'Twitter login',
-      webPreferences: {
-        sandbox: true,
-      },
-    });
-    twitterLoginWindow.loadURL('https://twitter.com');
+  ipcMain.handle(events.OPEN_TWITTER_WINDOW_CLICKED, async () => {
+    console.log(events.OPEN_TWITTER_WINDOW_CLICKED);
+    openWebWindow();
   });
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
+    openWebWindow();
     console.log(events.DOWNLOAD_FAVES_CLICKED);
     const favesList = readFavesFile(favesFilePath);
     downloadManager.addTasks(favesList);
     downloadManager.start(webWindow);
   });
+};
+
+const openWebWindow = () => {
+  if (!webWindow) {
+    webWindow = new BrowserWindow({
+      show: true,
+      width: 1000,
+      height: 800,
+      title: 'Twitter',
+      webPreferences: {
+        // find the way to control DOM of the external page
+        sandbox: false,
+        preload: path.join(__dirname, 'screens', 'TweetDownloadWindow', 'preload.js'),
+        backgroundThrottling: false,
+      },
+    });
+    webWindow.on('closed', () => (webWindow = null));
+    webWindow.loadURL('https://twitter.com');
+  }
 };
 
 const createWindow = () => {
@@ -100,19 +120,7 @@ const createWindow = () => {
 
   toolsWindow.loadFile(path.join(__dirname, 'screens', 'ToolsWindow', 'index.html'));
 
-  webWindow = new BrowserWindow({
-    show: true,
-    width: 1000,
-    height: 800,
-    title: 'Twitter',
-    webPreferences: {
-      // find the way to control DOM of the external page
-      sandbox: false,
-      preload: path.join(__dirname, 'screens', 'TweetDownloadWindow', 'preload.js'),
-    },
-  });
-  webWindow.loadURL('https://twitter.com');
-  webWindow.webContents.openDevTools();
+  // openWebWindow();
 };
 
 app.whenReady().then(() => {

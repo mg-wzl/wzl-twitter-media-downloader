@@ -19,7 +19,7 @@ document.querySelector('#clearCookiesButton').addEventListener('click', () => {
   window.on.clearCookiesClicked();
 });
 
-document.querySelector('#twitterLoginButton').addEventListener('click', () => {
+document.querySelector('#openTwitterButton').addEventListener('click', () => {
   window.on.twitterLoginClicked();
 });
 
