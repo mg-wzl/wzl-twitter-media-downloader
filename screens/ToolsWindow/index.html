@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <title>Tiny Twitter Scrapper</title>
+  </head>
+  <body>
+    <p id="info"></p>
+    <p></p>
+    <button id="pickFolderButton">Pick target folder</button>
+    <p id="targetFolder">[Not selected]</p>
+    <button id="pickFavesFileButton">Pick faves file</button>
+    <p id="favesFile">[Not selected]</p>
+    <p id="targetFolder">
+      Important! Must be JSON array file. Remove anything before first [ symbol
+    </p>
+    <br />
+    <button id="clearCookiesButton">Clear Cookies</button>
+    <br /><br />
+    <button id="twitterLoginButton">Twitter Login</button>
+    <p>You'll need to log into Twitter in this new window - feel free to close it afterwards</p>
+    <br />
+    <button id="downloadFavesButton">Download Faves</button>
+  </body>
+  <script src="./renderer.js"></script>
+</html>

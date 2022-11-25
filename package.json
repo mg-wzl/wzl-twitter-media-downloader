@@ -1,0 +1,30 @@
+{
+  "name": "wzl-twitter-scraper",
+  "version": "1.0.0",
+  "description": "Small Electron app which helps you download all your faved images from Twitter",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "test"
+  },
+  "repository": "git+https://github.com/mg-wzl/wzl-twitter-scraper.git",
+  "keywords": [
+    "twitter",
+    "scraper"
+  ],
+  "author": "mg-wzl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mg-wzl/wzl-twitter-scraper/issues"
+  },
+  "homepage": "https://github.com/mg-wzl/wzl-twitter-scraper#readme",
+  "private": false,
+  "devDependencies": {
+    "electron": "^21.3.0"
+  },
+  "dependencies": {
+    "axios": "^1.1.3",
+    "electron-dl": "^3.5.0",
+    "jsdom": "^20.0.2"
+  }
+}
