@@ -5,6 +5,8 @@ module.exports = Object.freeze({
   DOWNLOAD_FAVES_CLICKED: 'button:downloadFavesClicked',
   OPEN_TWITTER_WINDOW_CLICKED: 'button:twitterLoginClicked',
 
+  CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED: 'contextMenu:scrollAndScrape',
+
   WAIT_FOR_TWEET_PAGE_LOAD: 'waitForTweetPageLoad',
   TWEET_PAGE_LOADED: 'tweetPageLoaded',
   TWEET_FAILED_TO_LOAD: 'tweetFailedToLoad',

@@ -173,6 +173,10 @@ const isSessionBlocked = (document) => {
   return document.querySelector(interstitialGraphic);
 };
 
+const isProgressCircleVisible = (document) => {
+  return !!document.querySelector('div[role="progressbar"] circle');
+};
+
 module.exports = {
   getFileNameExtensionFromUrl,
   parseTweetUrl,
@@ -180,4 +184,5 @@ module.exports = {
   isTweetLoaded,
   isTweetImageLoaded,
   isSessionBlocked,
+  isProgressCircleVisible,
 };

@@ -17,9 +17,10 @@ contextMenu({
   append: (defaultActions, parameters, browserWindow) => [
     {
       label: 'Scroll to bottom',
-      // Only show it when right-clicking text
       visible: browserWindow?.id === webWindow?.id,
-      click: () => {},
+      click: () => {
+        webWindow.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED);
+      },
     },
   ],
 });
@@ -83,8 +84,8 @@ const openWebWindow = () => {
   if (!webWindow) {
     webWindow = new BrowserWindow({
       show: true,
-      width: 1000,
-      height: 800,
+      width: 1200,
+      height: 900,
       title: 'Twitter',
       webPreferences: {
         // find the way to control DOM of the external page
@@ -95,6 +96,7 @@ const openWebWindow = () => {
     });
     webWindow.on('closed', () => (webWindow = null));
     webWindow.loadURL('https://twitter.com');
+    webWindow.webContents.openDevTools();
   }
 };
 
