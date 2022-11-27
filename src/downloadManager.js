@@ -1,11 +1,10 @@
 const { ipcMain, BrowserWindow } = require('electron');
-const path = require('path');
-const os = require('os');
 const events = require('./events');
 const downloadUtils = require('./downloadUtils');
 const parser = require('./parser');
 const fileUtils = require('./fileUtils');
 const tweetApiHelper = require('./tweetApiHelper');
+const { getTargetFolder } = require('./fileManager');
 
 const STATUSES = {
   IDLE: 'idle',
@@ -13,12 +12,9 @@ const STATUSES = {
 };
 
 let __win;
-let targetFolderPath = path.join(os.homedir(), 'Documents', 'scraping', 'scrape01');
 
 let queueStatus = STATUSES.IDLE;
 const queue = [];
-const isTwitterSessionBlocked = false;
-let currentTask;
 
 let finishedDownloads = [];
 
@@ -33,7 +29,7 @@ const getNextTask = () => {
     return null;
   }
 
-  finishedDownloads = fileUtils.readFinishedDownloadsFile(targetFolderPath);
+  finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
   let nextTask;
   while (!nextTask && queue?.length > 0) {
     const temp = queue.shift();
@@ -70,11 +66,11 @@ const runDownloads = async (parsedTweet) => {
   const noFailedDownloads = await downloadUtils.downloadTweetImages(
     __win.webContents,
     parsedTweet,
-    targetFolderPath
+    getTargetFolder()
   );
   if (noFailedDownloads) {
     finishedDownloads?.push(parsedTweet.tweetId);
-    fileUtils.rewriteFinishedDownloadsFile(targetFolderPath, finishedDownloads);
+    fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
   }
   console.log('Tweet media loaded!');
   startNextTaskOrFinishWork();
@@ -120,11 +116,6 @@ const onSessionGotBlockedHandler = (event, parsedTweet) => {
   console.log(
     "Session is blocked! We can't continue parsing. Wait for 10 minutes or more and try again"
   );
-  isTwitterSessionBlocked = true;
-};
-
-const setTargetFolder = (newTargetFolder) => {
-  targetFolderPath = newTargetFolder;
 };
 
 const start = async (win, targetFolder) => {
@@ -145,8 +136,8 @@ const start = async (win, targetFolder) => {
   ipcMain.on(events.TWEET_FAILED_TO_LOAD, onTweetPageLoadFailedHandler);
   ipcMain.on(events.SESSION_GOT_BLOCKED, onSessionGotBlockedHandler);
   queueStatus = STATUSES.IN_PROGRESS;
-  console.log('TargetFolder:', targetFolderPath);
+  console.log('TargetFolder:', getTargetFolder());
   startNextTaskOrFinishWork();
 };
 
-module.exports = { start, addTasks, setTargetFolder };
+module.exports = { start, addTasks };

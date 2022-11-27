@@ -1,6 +1,8 @@
 const { ipcRenderer } = require('electron');
 const events = require('../../src/events');
+const { writeJsonFile } = require('../../src/fileUtils');
 const parser = require('../../src/parser');
+const { scrapingResultFilename } = require('./utils');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -66,12 +68,17 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetUrl) => {
 
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   console.log('preload:', events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, { args });
+  const { targetFolder, url } = args;
   const startTime = new Date().getTime();
-
   const SCROLL_INTERVAL = 600;
   const NEW_MUTATIONS_TIMEOUT = 5000;
   let containerHasMutations = false;
   const linksArray = [];
+
+  if (!targetFolder) {
+    console.log('Please set target folder');
+    return;
+  }
 
   const tweetsContainer = document.querySelector('div[data-testid="cellInnerDiv"]')?.parentElement;
   if (!tweetsContainer) {
@@ -110,8 +117,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
 
   const scraperIntervalId = setInterval(scrollDownAndScrape, SCROLL_INTERVAL);
 
-  // scrollDownAndScrape();
-
   const checkIntervalId = setInterval(() => {
     if (parser.isProgressCircleVisible(document)) {
       return;
@@ -129,6 +134,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
         } seconds`
       );
       console.log('Total links scraped:', linksArray.length);
+      writeJsonFile(linksArray, targetFolder, scrapingResultFilename(url));
     }
   }, NEW_MUTATIONS_TIMEOUT);
 });

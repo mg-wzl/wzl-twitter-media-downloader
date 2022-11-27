@@ -41,4 +41,22 @@ const rewriteFinishedDownloadsFile = (targetFolder, finishedIds) => {
   return finishedIds;
 };
 
-module.exports = { readFavesFile, readFinishedDownloadsFile, rewriteFinishedDownloadsFile };
+const writeJsonFile = (data, targetFolder, fileName) => {
+  if (!data || !targetFolder || !fileName) {
+    console.log('writeJsonFile: Incorrect parameters', { data, targetFolder, fileName });
+  }
+  const filePath = path.join(targetFolder, fileName);
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    console.log('Data file created:', filePath);
+  } catch (e) {
+    console.log(`Error when creating file: ${filePath} :`, e);
+  }
+};
+
+module.exports = {
+  readFavesFile,
+  readFinishedDownloadsFile,
+  rewriteFinishedDownloadsFile,
+  writeJsonFile,
+};

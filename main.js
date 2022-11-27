@@ -7,6 +7,7 @@ const electronDl = require('electron-dl');
 
 const events = require('./src/events');
 const downloadManager = require('./src/downloadManager');
+const { setTargetFolder, getTargetFolder } = require('./src/fileManager');
 const { readFavesFile } = require('./src/fileUtils');
 
 electronDl();
@@ -14,12 +15,15 @@ electronDl();
 contextMenu({
   showSaveImageAs: true,
   showCopyLink: true,
-  append: (defaultActions, parameters, browserWindow) => [
+  prepend: (defaultActions, parameters, browserWindow) => [
     {
       label: 'Scroll to bottom',
       visible: browserWindow?.id === webWindow?.id,
       click: () => {
-        webWindow.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED);
+        webWindow.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, {
+          targetFolder: getTargetFolder(),
+          url: webWindow.webContents?.getURL(),
+        });
       },
     },
   ],
@@ -40,7 +44,7 @@ const setupHandlers = (toolsWindow) => {
     if (canceled) {
       return;
     } else {
-      downloadManager.setTargetFolder(filePaths[0]);
+      setTargetFolder(filePaths[0]);
       return filePaths[0];
     }
   });
@@ -95,7 +99,7 @@ const openWebWindow = () => {
       },
     });
     webWindow.on('closed', () => (webWindow = null));
-    webWindow.loadURL('https://twitter.com');
+    webWindow.loadURL('https://twitter.com/');
     webWindow.webContents.openDevTools();
   }
 };
