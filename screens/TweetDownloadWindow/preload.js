@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron');
 const events = require('../../src/events');
 const { writeJsonFile } = require('../../src/fileUtils');
 const parser = require('../../src/parser');
+const { parseTweet } = require('../../src/singleTweetParser');
 const { scrapingResultFilename } = require('./utils');
 
 const OBSERVER_TIMEOUT = 5000;
@@ -99,17 +100,26 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
     if (parser.isProgressCircleVisible(document)) {
       return;
     }
-    const timeNodes = document.querySelectorAll('[data-testid="tweet"] a time');
-    //console.log('scrollDownAndScrape:', timeNodes);
-    const timeArr = [...timeNodes];
-    timeArr.forEach((timeElement, index) => {
-      const link = timeElement?.closest('a').href;
-      if (link && !linksArray.includes(link)) {
-        linksArray.push(link);
-        console.log(`${linksArray.length}: ${link}`);
+
+    const tweets = [...document.querySelectorAll('[data-testid="tweet"]')];
+    tweets.forEach((element) => {
+      const parsed = parseTweet(element);
+      if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
+        linksArray.push(parsed);
+        console.log(`${linksArray.length}:`, parsed);
       }
     });
-    // console.log(new Date(), 'scrollBy:', document.body.clientHeight);
+
+    // const timeNodes = document.querySelectorAll('[data-testid="tweet"] a time');
+    // const timeArr = [...timeNodes];
+    // timeArr.forEach((timeElement, index) => {
+    //   const link = timeElement?.closest('a').href;
+    //   if (link && !linksArray.includes(link)) {
+    //     linksArray.push(link);
+    //     console.log(`${linksArray.length}: ${link}`);
+    //   }
+    // });
+
     window.scrollBy({
       top: document.body.clientHeight * 2,
     });
