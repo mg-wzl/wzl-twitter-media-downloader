@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 const events = require('../../src/events');
 const { writeJsonFile } = require('../../src/fileUtils');
 const parser = require('../../src/parser');
-const { parseTweet } = require('../../src/singleTweetParser');
+const { parseTweet, parseComplexTweet } = require('../../src/singleTweetParser');
 const { scrapingResultFilename } = require('./utils');
 
 const OBSERVER_TIMEOUT = 5000;
@@ -103,10 +103,19 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
 
     const tweets = [...document.querySelectorAll('[data-testid="tweet"]')];
     tweets.forEach((element) => {
-      const parsed = parseTweet(element);
-      if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
-        linksArray.push(parsed);
-        console.log(`${linksArray.length}:`, parsed);
+      // const parsed = parseTweet(element);
+      // if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
+      //   linksArray.push(parsed);
+      //   console.log(`${linksArray.length}:`, parsed);
+      // }
+      const parsedResults = parseComplexTweet(element);
+      if (parsedResults?.length > 0) {
+        parsedResults.forEach((parsed) => {
+          if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
+            linksArray.push(parsed);
+            console.log(`${linksArray.length}:`, parsed);
+          }
+        });
       }
     });
 
