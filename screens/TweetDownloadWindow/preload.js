@@ -129,6 +129,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
     //   }
     // });
 
+    // if (linksArray.length < 10)
     window.scrollBy({
       top: document.body.clientHeight * 2,
     });

@@ -76,7 +76,15 @@ const parseImages = (tweetContainer, quoted) => {
   if (!imageElements?.length) {
     return null;
   }
-  const images = imageElements.map((img) => img.src);
+  const images = imageElements.map((img) => {
+    const urlString = img.src;
+    let urlLarge;
+    if (urlString) {
+      urlLarge = new URL(urlString);
+      urlLarge.searchParams.set('name', 'large');
+    }
+    return urlLarge ? urlLarge.toString() : urlString;
+  });
 
   return images;
 };
