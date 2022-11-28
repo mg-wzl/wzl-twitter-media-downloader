@@ -25,12 +25,10 @@ const parseText = (tweetContainer) => {
   return { text, hasYoutube };
 };
 
-const parseUserHAvatar = (tweetContainer) => {
+const parseUserAvatar = (tweetContainer) => {
   const avatarContainer = tweetContainer.querySelector('[data-testid*="UserAvatar-Container"]');
-  const profileUrl = avatarContainer?.querySelector('a')?.href || '';
   const avatarSmall = avatarContainer?.querySelector('img')?.src || '';
-
-  const avatar = avatarSmall.replace('x96', '400x400');
+  const avatar = avatarSmall?.replace(/(_x96|_normal)/, '_400x400');
 
   return { avatar };
 };
@@ -118,7 +116,7 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
   const { url, tweetId, dateTime, userHandle } = !quoted
     ? parseUrlAndDatetime(tweetContainer)
     : parseQuotedTweetUrlAndDatetime(tweetContainer);
-  const { avatar } = parseUserHAvatar(tweetContainer);
+  const { avatar } = parseUserAvatar(tweetContainer);
 
   let result = { type, userHandle, tweetId, url, dateTime, avatar };
   if (quoted) {
