@@ -11,11 +11,9 @@ const parseCard = (tweetContainer) => {
   if (!card) {
     return null;
   }
-  console.log('parseCard link container', cardA);
   const text = card.textContent || '';
   const url = cardA?.href || '';
   const hasYoutube = youtubeRegex.test(url) || youtubeRegex.test(text);
-  console.log('parseCard result', { text, url, hasYoutube });
   return { text, url, hasYoutube };
 };
 
@@ -34,7 +32,6 @@ const parseUserAvatar = (tweetContainer) => {
 };
 
 const parseUrlAndDatetime = (tweetContainer) => {
-  console.log('parseUrlAndDatetime', tweetContainer);
   const timeElement = tweetContainer.querySelector('time');
   const dateTime = timeElement?.dateTime;
   const url = timeElement?.closest('a')?.href || '';
@@ -46,19 +43,15 @@ const parseUrlAndDatetime = (tweetContainer) => {
 };
 
 const parseQuotedTweetUrlAndDatetime = (tweetContainer) => {
-  console.log('parseQuotedTweetUrlAndDatetime', tweetContainer);
   const timeElement = tweetContainer.querySelector('time');
   const dateTime = timeElement?.dateTime;
   const photoUrl = tweetContainer.querySelector('a')?.href;
-  console.log({ photoUrl });
   let url = null;
   if (photoUrl) {
     const tmpUrl = new URL(photoUrl);
     const tmpUrlParts = tmpUrl?.pathname?.split('/');
-    console.log({ tmpUrlParts });
     if (tmpUrlParts?.length > 3) {
       url = tmpUrl.origin + tmpUrlParts.slice(0, 4).join('/');
-      console.log({ url });
     }
   }
   const parseResults = parseTweetUrl(url);
@@ -147,9 +140,7 @@ const parseComplexTweet = (tweetContainer) => {
   if (!hasQuotedTweet) {
     mainTweetParsed = parseTweet(tweetContainer, tweetContainer, false);
   } else {
-    console.log('has quoted tweet:', tweetContainer);
     const mediaContainers = [...tweetContainer.querySelectorAll('div[aria-labelledby] > div')];
-    console.log('media containers', mediaContainers);
     if (mediaContainers?.length === 1) {
       // this is quoted tweet container
       quotedTweetParsed = parseTweet(mediaContainers[0], mediaContainers[0], true);

@@ -88,7 +88,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   }
 
   const observer = new MutationObserver((mutations) => {
-    // console.log('mutations:', mutations);
     containerHasMutations = true;
   });
   observer.observe(tweetsContainer, {
@@ -103,11 +102,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
 
     const tweets = [...document.querySelectorAll('[data-testid="tweet"]')];
     tweets.forEach((element) => {
-      // const parsed = parseTweet(element);
-      // if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
-      //   linksArray.push(parsed);
-      //   console.log(`${linksArray.length}:`, parsed);
-      // }
       const parsedResults = parseComplexTweet(element);
       if (parsedResults?.length > 0) {
         parsedResults.forEach((parsed) => {
@@ -118,16 +112,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
         });
       }
     });
-
-    // const timeNodes = document.querySelectorAll('[data-testid="tweet"] a time');
-    // const timeArr = [...timeNodes];
-    // timeArr.forEach((timeElement, index) => {
-    //   const link = timeElement?.closest('a').href;
-    //   if (link && !linksArray.includes(link)) {
-    //     linksArray.push(link);
-    //     console.log(`${linksArray.length}: ${link}`);
-    //   }
-    // });
 
     // if (linksArray.length < 10)
     window.scrollBy({
