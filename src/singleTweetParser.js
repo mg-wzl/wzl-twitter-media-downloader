@@ -95,15 +95,19 @@ const parseVideo = (tweetContainer, quoted) => {
 };
 
 const parseTweet = (tweetContainer, mediaContainer, quoted) => {
-  const images = parseImages(mediaContainer, quoted);
-  const video = parseVideo(mediaContainer, quoted);
-  let card;
-  let tweetText;
+  let images = null,
+    video = null,
+    card = null;
   let type = TYPE_MEDIA;
+  if (mediaContainer) {
+    images = parseImages(mediaContainer, quoted);
+    video = parseVideo(mediaContainer, quoted);
+    card = parseCard(mediaContainer);
+  }
+  let tweetText;
   if (!(images || video)) {
     // we don't need tweets with no media
     // check if the tweet has a youtube link in it
-    card = parseCard(mediaContainer);
     tweetText = parseText(tweetContainer);
     if (!card?.hasYoutube && !tweetText?.hasYoutube) {
       return null;
@@ -131,24 +135,27 @@ const parseComplexTweet = (tweetContainer) => {
   if (!tweetContainer) {
     return null;
   }
-  const mediaContainers = [...tweetContainer.querySelectorAll('div[aria-labelledby] > div')];
   let mainTweetParsed;
   let quotedTweetParsed;
-  if (mediaContainers?.length === 1) {
-    // can contain either main tweet with media or plain-text main tweet and quoted tweet
-    if (mediaContainers[0]?.querySelector('time')) {
+  const hasQuotedTweet = tweetContainer.querySelector('div[aria-labelledby][id] time');
+  if (!hasQuotedTweet) {
+    mainTweetParsed = parseTweet(tweetContainer, tweetContainer, false);
+  } else {
+    console.log('has quoted tweet:', tweetContainer);
+    const mediaContainers = [...tweetContainer.querySelectorAll('div[aria-labelledby] > div')];
+    console.log('media containers', mediaContainers);
+    if (mediaContainers?.length === 1) {
       // this is quoted tweet container
       quotedTweetParsed = parseTweet(mediaContainers[0], mediaContainers[0], true);
-      // not parsing main tweet in this case
-    } else {
-      // there is only main tweet
+      // main tweet can contain links to youtube. Don't look for images or videos
+      mainTweetParsed = parseTweet(tweetContainer, null, false);
+    } else if (mediaContainers?.length === 2) {
+      // both main and quoted tweets have media
       mainTweetParsed = parseTweet(tweetContainer, mediaContainers[0], false);
+      quotedTweetParsed = parseTweet(mediaContainers[1], mediaContainers[1], true);
     }
-  } else if (mediaContainers?.length === 2) {
-    // both main and quoted tweets have media
-    mainTweetParsed = parseTweet(tweetContainer, mediaContainers[0], false);
-    quotedTweetParsed = parseTweet(mediaContainers[1], mediaContainers[1], true);
   }
+
   return [mainTweetParsed, quotedTweetParsed].filter((v) => !!v);
 };
 
