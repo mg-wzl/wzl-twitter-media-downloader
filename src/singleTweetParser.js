@@ -1,6 +1,8 @@
 const { parseTweetUrl } = require('./parser');
 
 const youtubeRegex = /(youtube.com|youtu.be)/i;
+const protectedTweetRegex =
+  /(protect|защищен|proteg|приват|محميّ|受保|비공개|非公|chroni|Chráněn|protet|מוגן|dilindung|Заключен|Korumalı|được bảo|सुरक्षित|সুরক্ষি|સુરક્ષિ|ಸಂರಕ್ಷಿಸಿ|Geschützt|Afgescher|Beskytt|Skydd|Suojat|Protekt|Προστατευ|protég|protexi|chosaint|Védet)/i;
 
 const TYPE_MEDIA = 'media';
 const TYPE_YOUTUBE = 'youtube';
@@ -29,6 +31,11 @@ const parseUserAvatar = (tweetContainer) => {
   const avatar = avatarSmall?.replace(/(_x96|_normal)/, '_400x400');
 
   return { avatar };
+};
+
+const parseIsTweetProtected = (tweetContainer) => {
+  const svg = tweetContainer.querySelector('[data-testid="User-Names"] svg[aria-label]');
+  return protectedTweetRegex.test(svg?.ariaLabel);
 };
 
 const parseUrlAndDatetime = (tweetContainer) => {
@@ -94,6 +101,7 @@ const parseVideo = (tweetContainer, quoted) => {
 };
 
 const parseTweet = (tweetContainer, mediaContainer, quoted) => {
+  const protected = parseIsTweetProtected(tweetContainer);
   let images = null,
     video = null,
     card = null;
@@ -120,6 +128,9 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
   const { avatar } = parseUserAvatar(tweetContainer);
 
   let result = { type, userHandle, tweetId, url, dateTime, avatar };
+  if (protected) {
+    result = { ...result, protected };
+  }
   if (quoted) {
     result = { ...result, quoted };
   }
@@ -137,6 +148,7 @@ const parseComplexTweet = (tweetContainer) => {
   let mainTweetParsed;
   let quotedTweetParsed;
   const hasQuotedTweet = tweetContainer.querySelector('div[aria-labelledby][id] time');
+  // TODO: APPARENTLY!!!! There's a hidden <span> with "Quote Tweet" text which marks quote tweeets!!!!
   if (!hasQuotedTweet) {
     mainTweetParsed = parseTweet(tweetContainer, tweetContainer, false);
   } else {
