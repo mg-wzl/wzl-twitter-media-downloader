@@ -21,6 +21,9 @@ const getFileNameExtensionFromUrl = (url) => {
 };
 
 const parseTweetUrl = (tweetUrl) => {
+  if (!tweetUrl) {
+    return null;
+  }
   const url = new URL(tweetUrl);
   const pathParts = url?.pathname.split('/');
   let tweetId = '',
