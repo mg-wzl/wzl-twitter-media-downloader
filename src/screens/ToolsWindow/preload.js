@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const events = require('../../src/events'); // Why can't I import the events object???
+const events = require('../../events'); // Why can't I import the events object???
 
 contextBridge.exposeInMainWorld('on', {
   pickTargetFolderClicked: () => {

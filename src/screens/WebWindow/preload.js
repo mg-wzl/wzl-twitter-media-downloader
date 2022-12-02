@@ -1,9 +1,9 @@
 const { ipcRenderer } = require('electron');
-const events = require('../../src/events');
-const { writeJsonFile } = require('../../src/fileUtils');
-const parser = require('../../src/parser');
-const { parseTweet, parseComplexTweet } = require('../../src/singleTweetParser');
-const { scrapingResultFilename } = require('./utils');
+const events = require('../../events');
+const { writeJsonFile } = require('../../utils/fileUtils');
+const parser = require('../../parser');
+const { parseTweet, parseComplexTweet } = require('../../singleTweetParser');
+const { scrapedFileNameFromUrl } = require('../../utils/stringUtils');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -138,7 +138,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
         } seconds`
       );
       console.log('Total links scraped:', linksArray.length);
-      writeJsonFile(linksArray, targetFolder, scrapingResultFilename(url));
+      writeJsonFile(linksArray, targetFolder, scrapedFileNameFromUrl(url));
     }
   }, NEW_MUTATIONS_TIMEOUT);
 });

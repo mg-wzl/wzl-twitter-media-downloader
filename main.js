@@ -8,7 +8,7 @@ const electronDl = require('electron-dl');
 const events = require('./src/events');
 const downloadManager = require('./src/downloadManager');
 const { setTargetFolder, getTargetFolder } = require('./src/fileManager');
-const { readFavesFile } = require('./src/fileUtils');
+const { readFavesFile } = require('./src/utils/fileUtils');
 
 electronDl();
 
@@ -94,7 +94,7 @@ const openWebWindow = () => {
       webPreferences: {
         // find the way to control DOM of the external page
         sandbox: false,
-        preload: path.join(__dirname, 'screens', 'TweetDownloadWindow', 'preload.js'),
+        preload: path.join(__dirname, 'src', 'screens', 'WebWindow', 'preload.js'),
         backgroundThrottling: false,
       },
     });
@@ -110,7 +110,7 @@ const createWindow = () => {
     height: 600,
     title: 'Tools',
     webPreferences: {
-      preload: path.join(__dirname, 'screens', 'ToolsWindow', 'preload.js'),
+      preload: path.join(__dirname, 'src', 'screens', 'ToolsWindow', 'preload.js'),
       sandbox: false,
     },
   });
@@ -124,7 +124,7 @@ const createWindow = () => {
   //   }
   // });
 
-  toolsWindow.loadFile(path.join(__dirname, 'screens', 'ToolsWindow', 'index.html'));
+  toolsWindow.loadFile(path.join(__dirname, 'src', 'screens', 'ToolsWindow', 'index.html'));
 
   // openWebWindow();
 };

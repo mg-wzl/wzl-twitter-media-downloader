@@ -17,7 +17,7 @@ const filenameFromTwitterUrl = (urlString) => {
   return filename;
 };
 
-const scrapingResultFilename = (urlString) => {
+const scrapedFileNameFromUrl = (urlString) => {
   const now = new Date();
   const dateString = `${now.getFullYear()}${
     now.getMonth() + 1
@@ -26,5 +26,5 @@ const scrapingResultFilename = (urlString) => {
 };
 
 module.exports = {
-  scrapingResultFilename,
+  scrapedFileNameFromUrl,
 };

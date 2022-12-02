@@ -1,8 +1,8 @@
 const { ipcMain, BrowserWindow } = require('electron');
 const events = require('./events');
-const downloadUtils = require('./downloadUtils');
+const downloadUtils = require('./utils/downloadUtils');
 const parser = require('./parser');
-const fileUtils = require('./fileUtils');
+const fileUtils = require('./utils/fileUtils');
 const tweetApiHelper = require('./tweetApiHelper');
 const { getTargetFolder } = require('./fileManager');
 
