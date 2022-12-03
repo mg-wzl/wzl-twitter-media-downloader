@@ -1,4 +1,4 @@
-const parser = require('./parser');
+const parser = require('./parsers/tweetPageParser');
 const axios = require('axios');
 
 const BASE_URL = 'https://tweetpik.com/api/tweets';

@@ -1,4 +1,4 @@
-const { parseTweetUrl } = require('./parser');
+const { parseTweetUrl } = require('./tweetPageParser');
 
 const youtubeRegex = /(youtube.com|youtu.be)/i;
 const protectedTweetRegex =

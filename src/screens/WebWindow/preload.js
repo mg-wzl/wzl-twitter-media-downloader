@@ -1,8 +1,8 @@
 const { ipcRenderer } = require('electron');
 const events = require('../../events');
 const { writeJsonFile } = require('../../utils/fileUtils');
-const parser = require('../../parser');
-const { parseTweet, parseComplexTweet } = require('../../singleTweetParser');
+const parser = require('../../parsers/tweetPageParser');
+const { parseTweet, parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl } = require('../../utils/stringUtils');
 
 const OBSERVER_TIMEOUT = 5000;
