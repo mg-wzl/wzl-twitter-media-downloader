@@ -2,8 +2,8 @@ const { ipcRenderer } = require('electron');
 const events = require('../../events');
 const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
-const { parseTweet, parseComplexTweet } = require('../../parsers/inFeedTweetParser');
-const { scrapedFileNameFromUrl } = require('../../utils/stringUtils');
+const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
+const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -12,7 +12,7 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetUrl) => {
     const fave = tweetUrl;
     console.log('preload: received', events.WAIT_FOR_TWEET_PAGE_LOAD);
     console.log('preload: received', tweetUrl);
-    const { tweetId } = parser.parseTweetUrl(tweetUrl);
+    const { tweetId } = parseTweetUrl(tweetUrl);
     return new Promise((resolve, reject) => {
       // if (parser.isTweetLoaded(document)) {
       if (parser.isTweetImageLoaded(document, tweetId)) {

@@ -1,10 +1,10 @@
 const { ipcMain, BrowserWindow } = require('electron');
 const events = require('./events');
 const downloadUtils = require('./utils/downloadUtils');
-const parser = require('./parsers/tweetPageParser');
 const fileUtils = require('./utils/fileUtils');
 const tweetApiHelper = require('./tweetApiHelper');
 const { getTargetFolder } = require('./fileManager');
+const { parseTweetUrl } = require('./utils/stringUtils');
 
 const STATUSES = {
   IDLE: 'idle',
@@ -33,7 +33,7 @@ const getNextTask = () => {
   let nextTask;
   while (!nextTask && queue?.length > 0) {
     const temp = queue.shift();
-    const parsedTask = parser.parseTweetUrl(temp);
+    const parsedTask = parseTweetUrl(temp);
     if (parsedTask?.tweetId) {
       if (finishedDownloads.includes(parsedTask.tweetId)) {
         console.log('Skipping task:', temp);
@@ -79,7 +79,7 @@ const runDownloads = async (parsedTweet) => {
 const startTask = async (win, task) => {
   console.log('start task', { task });
   // FIRST we need to try external api. This way we can avoid parsing, which is HUGE
-  const parsedTask = parser.parseTweetUrl(task);
+  const parsedTask = parseTweetUrl(task);
   const apiResult = await tweetApiHelper
     .fetchTweetContent(parsedTask.tweetId)
     .catch((e) =>

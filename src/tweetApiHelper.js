@@ -1,4 +1,5 @@
 const parser = require('./parsers/tweetPageParser');
+const { getFileExtensionFromUrl } = require('./utils/stringUtils');
 const axios = require('axios');
 
 const BASE_URL = 'https://tweetpik.com/api/tweets';
@@ -21,7 +22,7 @@ const getMedia = async (tweetData) => {
         if (media?.type === 'photo' && media?.url) {
           mediaArr.push({
             url: media?.url,
-            extension: parser.getFileNameExtensionFromUrl(media.url),
+            extension: getFileExtensionFromUrl(media.url),
           });
         } else if (media?.type === 'animated_gif' || media?.type === 'video') {
           const videoResult = await axios(`${BASE_URL}/${tweetData.id}/video`);
@@ -40,7 +41,7 @@ const getMedia = async (tweetData) => {
               if (biggestVariant?.url) {
                 mediaArr.push({
                   url: biggestVariant?.url,
-                  extension: parser.getFileNameExtensionFromUrl(biggestVariant.url),
+                  extension: getFileExtensionFromUrl(biggestVariant.url),
                 });
               }
             }

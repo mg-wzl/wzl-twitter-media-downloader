@@ -1,4 +1,4 @@
-const { parseTweetUrl } = require('./tweetPageParser');
+const { parseTweetUrl } = require('../utils/stringUtils');
 
 const youtubeRegex = /(youtube.com|youtu.be)/i;
 const protectedTweetRegex =
@@ -168,4 +168,4 @@ const parseComplexTweet = (tweetContainer) => {
   return [mainTweetParsed, quotedTweetParsed].filter((v) => !!v);
 };
 
-module.exports = { parseTweet, parseComplexTweet };
+module.exports = { parseComplexTweet };
