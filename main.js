@@ -9,6 +9,7 @@ const events = require('./src/events');
 const downloadManager = require('./src/downloadManager');
 const { setTargetFolder, getTargetFolder } = require('./src/fileManager');
 const { readFavesFile } = require('./src/utils/fileUtils');
+const uiLogger = require('./src/utils/uiLogger');
 
 electronDl();
 
@@ -106,8 +107,8 @@ const openWebWindow = () => {
 
 const createWindow = () => {
   toolsWindow = new BrowserWindow({
-    width: 500,
-    height: 600,
+    width: 800,
+    height: 900,
     title: 'Tools',
     webPreferences: {
       preload: path.join(__dirname, 'src', 'screens', 'ToolsWindow', 'preload.js'),
@@ -115,6 +116,7 @@ const createWindow = () => {
     },
   });
 
+  uiLogger.init(toolsWindow);
   setupHandlers();
 
   // TODO: why it throws an error?

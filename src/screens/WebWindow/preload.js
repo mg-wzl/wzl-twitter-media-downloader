@@ -4,6 +4,7 @@ const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
+const uiLogger = require('../../utils/uiLogger');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -108,6 +109,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
           if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
             linksArray.push(parsed);
             console.log(`${linksArray.length}:`, parsed);
+            uiLogger.success(`${linksArray.length}: ${parsed.url}`);
           }
         });
       }
