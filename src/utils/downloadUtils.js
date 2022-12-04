@@ -5,7 +5,7 @@ const windowManager = require('../windowManager');
 
 const downloadImage = async (url, name, extension, targetFolder) => {
   console.log('Download image()', { url, name, extension, targetFolder });
-  const win = windowManager.getAnonSingleTweetWindow(); // we don't need a session to download images
+  const win = windowManager.getSingleTweetWindow(); // TODO: using anon session causes error sometimes???
   const filename = `${name}.${extension}`;
 
   const result = await download(win, url, {
@@ -36,7 +36,7 @@ const getFileName = (tweetContent, image, index) => {
   return fileName;
 };
 
-const downloadTweetImages = async (webContents, tweetContent, targetFolder) => {
+const downloadTweetImages = async (tweetContent, targetFolder) => {
   console.log('Download images', { tweetContent, targetFolder });
   let noFailedDownloads = false;
   if (tweetContent.images) {

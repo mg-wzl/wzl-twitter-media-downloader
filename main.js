@@ -4,14 +4,14 @@ const contextMenu = require('electron-context-menu');
 const electronDl = require('electron-dl');
 
 const events = require('./src/events');
-const downloadManager = require('./src/downloadManager');
+const tweetPageParserQueue = require('./src/tweetPageParserQueue');
 const {
   setTargetFolder,
   getTargetFolder,
   setFavesFilePath,
   getFavesFilePath,
 } = require('./src/fileManager');
-const { readFavesFile } = require('./src/utils/fileUtils');
+const { readOfficialLikesFile } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
 
@@ -78,11 +78,13 @@ const setupHandlers = () => {
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
     windowManager.openSingleTweetWindow();
-    windowManager.openAnonSingleTweetWindow();
+    // windowManager.openAnonSingleTweetWindow();
     console.log(events.DOWNLOAD_FAVES_CLICKED);
-    const favesList = readFavesFile(getFavesFilePath());
-    downloadManager.addTasks(favesList);
-    downloadManager.start(windowManager.getSingleTweetWindow());
+    const favesList = readOfficialLikesFile(getFavesFilePath());
+    tweetPageParserQueue.addTasks(
+      tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(favesList)
+    );
+    tweetPageParserQueue.start(windowManager.getSingleTweetWindow());
     // downloadManager.start(windowManager.getAnonSingleTweetWindow());
   });
 };

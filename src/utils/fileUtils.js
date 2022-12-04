@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const readFavesFile = (path) => {
+const readOfficialLikesFile = (path) => {
   let rawdata = fs.readFileSync(path);
   let favesList = [];
   try {
@@ -55,7 +55,7 @@ const writeJsonFile = (data, targetFolder, fileName) => {
 };
 
 module.exports = {
-  readFavesFile,
+  readOfficialLikesFile,
   readFinishedDownloadsFile,
   rewriteFinishedDownloadsFile,
   writeJsonFile,

@@ -8,15 +8,14 @@ const uiLogger = require('../../utils/uiLogger');
 
 const OBSERVER_TIMEOUT = 5000;
 
-ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetUrl) => {
+ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
   const waitForTwitPage = () => {
-    const fave = tweetUrl;
+    const fave = tweetPageTask;
     console.log('preload: received', events.WAIT_FOR_TWEET_PAGE_LOAD);
-    console.log('preload: received', tweetUrl);
-    const { tweetId } = parseTweetUrl(tweetUrl);
+    console.log('preload: received', tweetPageTask);
     return new Promise((resolve, reject) => {
       // if (parser.isTweetLoaded(document)) {
-      if (parser.isTweetImageLoaded(document, tweetId)) {
+      if (parser.isTweetImageLoaded(document, tweetPageTask.tweetId)) {
         const parsedTweet = parser.parseTweetWithDOM(document, fave);
         return resolve(parsedTweet);
       }
@@ -29,7 +28,7 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetUrl) => {
       const observer = new MutationObserver((mutations) => {
         console.log('mutations:', mutations);
         // if (parser.isTweetLoaded(document)) {
-        if (parser.isTweetImageLoaded(document, tweetId)) {
+        if (parser.isTweetImageLoaded(document, tweetPageTask.tweetId)) {
           const parsedTweet = parser.parseTweetWithDOM(document, fave);
           observer.disconnect();
           if (timeout) {
