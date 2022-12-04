@@ -11,6 +11,8 @@ let webWindow;
 let singleTweetWindow;
 let anonSingleTweetWindow;
 
+let downloaderWindow; // goes invisible
+
 const getToolsWindow = () => toolsWindow;
 
 const getWebWindow = () => webWindow;
@@ -70,7 +72,7 @@ const openSingleTweetWindowInner = (isAnonymous) => {
         partition: isAnonymous ? ANONYMOUS_SESSION_PARTITION : undefined,
       },
     });
-    targetWindow.loadFile(path.join(__dirname, 'screens', 'SingleTweetWindow', 'index.html'));
+    targetWindow.loadFile(path.join(__dirname, 'screens', 'empty.html'));
     targetWindow.on('closed', () => (targetWindow = null));
     targetWindow.webContents.openDevTools();
     if (isAnonymous) {
@@ -79,6 +81,30 @@ const openSingleTweetWindowInner = (isAnonymous) => {
       singleTweetWindow = targetWindow;
     }
   }
+};
+
+const getDownloaderWindow = () => {
+  if (!downloaderWindow) {
+    downloaderWindow = new BrowserWindow({
+      show: false,
+      width: 100,
+      height: 100,
+      title: 'Downloader',
+      webPreferences: {
+        // find the way to control DOM of the external page
+        sandbox: false,
+        backgroundThrottling: false,
+        partition: ANONYMOUS_SESSION_PARTITION,
+      },
+    });
+    downloaderWindow.loadFile(path.join(__dirname, 'screens', 'empty.html'));
+  }
+  return downloaderWindow;
+};
+
+const closeDownloaderWindow = () => {
+  downloaderWindow?.close();
+  downloaderWindow = null;
 };
 
 const openSingleTweetWindow = () => {
@@ -98,4 +124,6 @@ module.exports = {
   getSingleTweetWindow,
   openAnonSingleTweetWindow,
   getAnonSingleTweetWindow,
+  getDownloaderWindow,
+  closeDownloaderWindow,
 };
