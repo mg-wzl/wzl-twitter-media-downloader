@@ -1,5 +1,6 @@
 const { BrowserWindow } = require('electron');
 const path = require('path');
+const uiLogger = require('./utils/uiLogger');
 
 // only to be used from main thread
 let toolsWindow;
@@ -8,25 +9,28 @@ let webWindow;
 let singleTweetWindow;
 let anonSingleTweetWindow;
 
-const setToolsWindow = (window) => {
-  toolsWindow = window;
-};
 const getToolsWindow = () => toolsWindow;
 
-const setWebWindow = (window) => {
-  webWindow = window;
-};
 const getWebWindow = () => webWindow;
 
-const setSingleTweetWindow = (window) => {
-  singleTweetWindow = window;
-};
 const getSingleTweetWindow = () => singleTweetWindow;
 
-const setAnonSingleTweetWindow = (window) => {
-  anonSingleTweetWindow = window;
-};
 const getAnonSingleTweetWindow = () => anonSingleTweetWindow;
+
+const openToolsWindow = () => {
+  toolsWindow = new BrowserWindow({
+    width: 800,
+    height: 900,
+    title: 'Tools',
+    webPreferences: {
+      preload: path.join(__dirname, 'screens', 'ToolsWindow', 'preload.js'),
+      sandbox: false,
+    },
+  });
+  toolsWindow.loadFile(path.join(__dirname, 'screens', 'ToolsWindow', 'index.html'));
+
+  uiLogger.init(toolsWindow);
+};
 
 const openWebWindow = () => {
   if (!webWindow) {
@@ -48,4 +52,4 @@ const openWebWindow = () => {
   }
 };
 
-module.exports = { openWebWindow, getWebWindow };
+module.exports = { openWebWindow, getWebWindow, openToolsWindow, getToolsWindow };

@@ -1,13 +1,16 @@
-const { app, BrowserWindow, dialog, ipcMain, session } = require('electron');
-const path = require('path');
-const os = require('os');
+const { app, dialog, ipcMain, session } = require('electron');
 
 const contextMenu = require('electron-context-menu');
 const electronDl = require('electron-dl');
 
 const events = require('./src/events');
 const downloadManager = require('./src/downloadManager');
-const { setTargetFolder, getTargetFolder } = require('./src/fileManager');
+const {
+  setTargetFolder,
+  getTargetFolder,
+  setFavesFilePath,
+  getFavesFilePath,
+} = require('./src/fileManager');
 const { readFavesFile } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
@@ -32,14 +35,10 @@ contextMenu({
   ],
 });
 
-let toolsWindow;
-
-let favesFilePath = path.join(os.homedir(), 'Documents', 'scraping', 'like.js');
-
-const setupHandlers = (toolsWindow) => {
+const setupHandlers = () => {
   ipcMain.handle(events.PICK_TARGET_FOLDER_CLICKED, async () => {
     console.log(events.PICK_TARGET_FOLDER_CLICKED);
-    const { canceled, filePaths } = await dialog.showOpenDialog(toolsWindow, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(windowManager?.getToolsWindow(), {
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
     });
     console.log('Target folder: ', { canceled, filePaths });
@@ -53,15 +52,15 @@ const setupHandlers = (toolsWindow) => {
 
   ipcMain.handle(events.PICK_FAVES_FILE_CLICKED, async () => {
     console.log(events.PICK_FAVES_FILE_CLICKED);
-    const { canceled, filePaths } = await dialog.showOpenDialog(toolsWindow, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(windowManager?.getToolsWindow(), {
       properties: ['openFile'],
     });
     console.log('Faves file: ', { canceled, filePaths });
     if (canceled) {
       return;
     } else {
-      favesFilePath = filePaths[0];
-      return favesFilePath;
+      setFavesFilePath(filePaths[0]);
+      return filePaths[0];
     }
   });
 
@@ -80,24 +79,14 @@ const setupHandlers = (toolsWindow) => {
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
     windowManager.openWebWindow();
     console.log(events.DOWNLOAD_FAVES_CLICKED);
-    const favesList = readFavesFile(favesFilePath);
+    const favesList = readFavesFile(getFavesFilePath());
     downloadManager.addTasks(favesList);
     downloadManager.start(windowManager.getWebWindow());
   });
 };
 
 const createWindow = () => {
-  toolsWindow = new BrowserWindow({
-    width: 800,
-    height: 900,
-    title: 'Tools',
-    webPreferences: {
-      preload: path.join(__dirname, 'src', 'screens', 'ToolsWindow', 'preload.js'),
-      sandbox: false,
-    },
-  });
-
-  uiLogger.init(toolsWindow);
+  windowManager.openToolsWindow();
   setupHandlers();
 
   // TODO: why it throws an error?
@@ -106,8 +95,6 @@ const createWindow = () => {
   //     createWindow();
   //   }
   // });
-
-  toolsWindow.loadFile(path.join(__dirname, 'src', 'screens', 'ToolsWindow', 'index.html'));
 };
 
 app.whenReady().then(() => {
