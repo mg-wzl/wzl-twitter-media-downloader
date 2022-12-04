@@ -1,13 +1,14 @@
 const { BrowserWindow } = require('electron');
 const path = require('path');
 const { download } = require('electron-dl');
+const windowManager = require('../windowManager');
 
-const downloadImage = async (webContents, url, name, extension, targetFolder) => {
+const downloadImage = async (url, name, extension, targetFolder) => {
   console.log('Download image()', { url, name, extension, targetFolder });
-  const win = BrowserWindow.getAllWindows();
+  const win = windowManager.getAnonSingleTweetWindow(); // we don't need a session to download images
   const filename = `${name}.${extension}`;
 
-  const result = await download(win?.[0], url, {
+  const result = await download(win, url, {
     directory: targetFolder,
     filename,
     onProgress: (progress) =>
@@ -44,13 +45,7 @@ const downloadTweetImages = async (webContents, tweetContent, targetFolder) => {
       const image = tweetContent.images[i];
       if (image && image.url && image.extension) {
         let fileName = getFileName(tweetContent, image, i);
-        const isCompleted = await downloadImage(
-          webContents,
-          image.url,
-          fileName,
-          image.extension,
-          targetFolder
-        );
+        const isCompleted = await downloadImage(image.url, fileName, image.extension, targetFolder);
         console.log('image download RESULT:', { url: image.url, result: isCompleted });
         if (!isCompleted) {
           noFailedDownloads = false;

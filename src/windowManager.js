@@ -2,6 +2,8 @@ const { BrowserWindow } = require('electron');
 const path = require('path');
 const uiLogger = require('./utils/uiLogger');
 
+const ANONYMOUS_SESSION_PARTITION = 'anonymous';
+
 // only to be used from main thread
 let toolsWindow;
 let webWindow;
@@ -52,4 +54,48 @@ const openWebWindow = () => {
   }
 };
 
-module.exports = { openWebWindow, getWebWindow, openToolsWindow, getToolsWindow };
+const openSingleTweetWindowInner = (isAnonymous) => {
+  let targetWindow = isAnonymous ? anonSingleTweetWindow : singleTweetWindow;
+  if (!targetWindow) {
+    targetWindow = new BrowserWindow({
+      show: true,
+      width: 1200,
+      height: 900,
+      title: 'Twitter',
+      webPreferences: {
+        // find the way to control DOM of the external page
+        sandbox: false,
+        preload: path.join(__dirname, 'screens', 'SingleTweetWindow', 'preload.js'),
+        backgroundThrottling: false,
+        partition: isAnonymous ? ANONYMOUS_SESSION_PARTITION : undefined,
+      },
+    });
+    targetWindow.on('closed', () => (targetWindow = null));
+    targetWindow.loadURL('https://twitter.com/');
+    targetWindow.webContents.openDevTools();
+    if (isAnonymous) {
+      anonSingleTweetWindow = targetWindow;
+    } else {
+      singleTweetWindow = targetWindow;
+    }
+  }
+};
+
+const openSingleTweetWindow = () => {
+  openSingleTweetWindowInner(false);
+};
+
+const openAnonSingleTweetWindow = () => {
+  openSingleTweetWindowInner(true);
+};
+
+module.exports = {
+  openWebWindow,
+  getWebWindow,
+  openToolsWindow,
+  getToolsWindow,
+  openSingleTweetWindow,
+  getSingleTweetWindow,
+  openAnonSingleTweetWindow,
+  getAnonSingleTweetWindow,
+};

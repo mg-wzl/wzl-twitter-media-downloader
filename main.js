@@ -77,11 +77,13 @@ const setupHandlers = () => {
   });
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
-    windowManager.openWebWindow();
+    windowManager.openSingleTweetWindow();
+    windowManager.openAnonSingleTweetWindow();
     console.log(events.DOWNLOAD_FAVES_CLICKED);
     const favesList = readFavesFile(getFavesFilePath());
     downloadManager.addTasks(favesList);
-    downloadManager.start(windowManager.getWebWindow());
+    downloadManager.start(windowManager.getSingleTweetWindow());
+    // downloadManager.start(windowManager.getAnonSingleTweetWindow());
   });
 };
 
