@@ -1,3 +1,13 @@
+const urlFromTweetIdAndUserHandle = (tweetId, userHandle) => {
+  if (!tweetId) {
+    return 'err: no tweetId';
+  }
+  if (!userHandle) {
+    return `https://twitter.com/i/web/status/${tweetId}`;
+  }
+  return `https://twitter.com/${userHandle}/status/${tweetId}`;
+};
+
 const filenameFromTwitterUrl = (urlString) => {
   if (!urlString) {
     return null;
@@ -60,4 +70,5 @@ module.exports = {
   scrapedFileNameFromUrl,
   getFileExtensionFromUrl,
   parseTweetUrl,
+  urlFromTweetIdAndUserHandle,
 };

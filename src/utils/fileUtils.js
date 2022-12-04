@@ -10,9 +10,9 @@ const readOfficialLikesFile = (path) => {
   } catch (e) {
     console.log('Not a valid JSON file.', e);
   }
-  console.log('Faves >>>>');
-  console.log(favesList);
-  console.log('<<<< Faves');
+  // console.log('Faves >>>>');
+  // console.log(favesList);
+  // console.log('<<<< Faves');
 
   return favesList;
 };

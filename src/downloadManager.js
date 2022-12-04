@@ -1,23 +1,53 @@
 const events = require('./events');
 const downloadUtils = require('./utils/downloadUtils');
+const stringUtils = require('./utils/stringUtils');
 const fileUtils = require('./utils/fileUtils');
 const { getTargetFolder } = require('./fileManager');
+const uiLogger = require('./utils/uiLogger');
+
+const MAX_BUFFER_SIZE = 15; // will wait until this number of downloads is complete before updating service files
 
 let finishedDownloads = [];
+let finishedDownloadsBuffer = [];
+
+// let finishedDownloads = [];
+// let finishedDownloadsBuffer = [];
 
 const isInFinishedDownloads = (tweetId) => {
-  finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
-  return finishedDownloads.includes(tweetId);
+  if (finishedDownloads?.length === 0 && finishedDownloadsBuffer.length === 0) {
+    finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
+  }
+  return finishedDownloads.includes(tweetId) || finishedDownloadsBuffer.includes(tweetId);
 };
 
 // TODO; change to supporting array of parsed tweets
 const runDownloads = async (parsedTweet) => {
-  console.log('MAIN RECEIVED', events.TWEET_PAGE_LOADED);
-  console.log('MAIN RECEIVED parsed Tweet:', parsedTweet);
+  console.log('runDownloads()', events.TWEET_PAGE_LOADED);
   const noFailedDownloads = await downloadUtils.downloadTweetImages(parsedTweet, getTargetFolder());
   if (noFailedDownloads) {
-    finishedDownloads?.push(parsedTweet.tweetId);
-    fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
+    finishedDownloadsBuffer.push(parsedTweet.tweetId);
+    uiLogger.success(
+      `#${
+        finishedDownloads.length + finishedDownloadsBuffer.length
+      } Downloaded: ${stringUtils.urlFromTweetIdAndUserHandle(
+        parsedTweet?.tweetId,
+        parsedTweet?.userHandle
+      )}`
+    );
+    if (finishedDownloadsBuffer.length >= MAX_BUFFER_SIZE) {
+      finishedDownloads.push(...finishedDownloadsBuffer);
+      finishedDownloadsBuffer = [];
+      fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
+    }
+    // finishedDownloads?.push(parsedTweet.tweetId);
+    // fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
+  } else {
+    uiLogger.error(
+      `Failed to load: ${stringUtils.urlFromTweetIdAndUserHandle(
+        parsedTweet?.tweetId,
+        parsedTweet?.userHandle
+      )}`
+    );
   }
   console.log('Tweet media loaded!');
 };

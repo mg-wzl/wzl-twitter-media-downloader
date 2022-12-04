@@ -4,7 +4,7 @@ const { download } = require('electron-dl');
 const windowManager = require('../windowManager');
 
 const downloadImage = async (url, name, extension, targetFolder) => {
-  console.log('Download image()', { url, name, extension, targetFolder });
+  // console.log('Download image()', { url, name, extension, targetFolder });
   const win = windowManager.getSingleTweetWindow(); // TODO: using anon session causes error sometimes???
   const filename = `${name}.${extension}`;
 

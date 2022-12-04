@@ -4,7 +4,6 @@ const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
-const uiLogger = require('../../utils/uiLogger');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -57,6 +56,7 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
   };
 
   setTimeout(() => {
+    console.log('SingleTweetWindow: <-', events.WAIT_FOR_TWEET_PAGE_LOAD);
     waitForTwitPage()
       .then((tweet) => {
         console.log('Tweet loaded!', tweet);
@@ -66,5 +66,5 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
         console.log('Tweet failed to load!', e);
         ipcRenderer.send(events.TWEET_FAILED_TO_LOAD, e);
       });
-  }, 5000);
+  }, 1000);
 });

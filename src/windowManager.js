@@ -70,8 +70,8 @@ const openSingleTweetWindowInner = (isAnonymous) => {
         partition: isAnonymous ? ANONYMOUS_SESSION_PARTITION : undefined,
       },
     });
+    targetWindow.loadFile(path.join(__dirname, 'screens', 'SingleTweetWindow', 'index.html'));
     targetWindow.on('closed', () => (targetWindow = null));
-    targetWindow.loadURL('https://twitter.com/');
     targetWindow.webContents.openDevTools();
     if (isAnonymous) {
       anonSingleTweetWindow = targetWindow;

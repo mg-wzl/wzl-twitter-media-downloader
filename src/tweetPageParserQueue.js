@@ -4,7 +4,8 @@ const downloadUtils = require('./utils/downloadUtils');
 const fileUtils = require('./utils/fileUtils');
 const tweetApiHelper = require('./tweetApiHelper');
 const { getTargetFolder } = require('./fileManager');
-const { parseTweetUrl } = require('./utils/stringUtils');
+const { parseTweetUrl, urlFromTweetIdAndUserHandle } = require('./utils/stringUtils');
+const uiLogger = require('./utils/uiLogger');
 const downloadManager = require('./downloadManager');
 
 class TweetPageTask {
@@ -110,6 +111,9 @@ const download = async (parsedTweet) => {
 
 const onTweetPageLoadFailedHandler = (event, parsedTweet) => {
   console.log('-- Failed to load tweet: ', parsedTweet, '---');
+  uiLogger.error(
+    `Failed to parse: ${urlFromTweetIdAndUserHandle(parsedTweet?.tweetId, parsedTweet?.userHandle)}`
+  );
   // TODO: add to failed.js file
   startNextTaskOrFinishWork();
 };
