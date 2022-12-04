@@ -10,9 +10,6 @@ const MAX_BUFFER_SIZE = 15; // will wait until this number of downloads is compl
 let finishedDownloads = [];
 let finishedDownloadsBuffer = [];
 
-// let finishedDownloads = [];
-// let finishedDownloadsBuffer = [];
-
 const isInFinishedDownloads = (tweetId) => {
   if (finishedDownloads?.length === 0 && finishedDownloadsBuffer.length === 0) {
     finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
@@ -23,16 +20,15 @@ const isInFinishedDownloads = (tweetId) => {
 // TODO; change to supporting array of parsed tweets
 const runDownloads = async (parsedTweet) => {
   console.log('runDownloads()', events.TWEET_PAGE_LOADED);
+  const tweetUrl = stringUtils.urlFromTweetIdAndUserHandle(
+    parsedTweet?.tweetId,
+    parsedTweet?.userHandle
+  );
   const noFailedDownloads = await downloadUtils.downloadTweetImages(parsedTweet, getTargetFolder());
   if (noFailedDownloads) {
     finishedDownloadsBuffer.push(parsedTweet.tweetId);
     uiLogger.success(
-      `#${
-        finishedDownloads.length + finishedDownloadsBuffer.length
-      } Downloaded: ${stringUtils.urlFromTweetIdAndUserHandle(
-        parsedTweet?.tweetId,
-        parsedTweet?.userHandle
-      )}`
+      `#${finishedDownloads.length + finishedDownloadsBuffer.length} Downloaded: ${tweetUrl}`
     );
     if (finishedDownloadsBuffer.length >= MAX_BUFFER_SIZE) {
       finishedDownloads.push(...finishedDownloadsBuffer);
@@ -42,12 +38,8 @@ const runDownloads = async (parsedTweet) => {
     // finishedDownloads?.push(parsedTweet.tweetId);
     // fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
   } else {
-    uiLogger.error(
-      `Failed to load: ${stringUtils.urlFromTweetIdAndUserHandle(
-        parsedTweet?.tweetId,
-        parsedTweet?.userHandle
-      )}`
-    );
+    uiLogger.error(`Failed to load: ${tweetUrl}`);
+    fileUtils.appendFailedDownloadsFile(getTargetFolder(), [tweetUrl]);
   }
   console.log('Tweet media loaded!');
 };

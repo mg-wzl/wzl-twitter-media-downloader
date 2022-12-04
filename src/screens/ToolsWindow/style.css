@@ -7,14 +7,17 @@
   z-index: 1;
 }
 
-#logContainer {
-  overflow: scroll;
-  height: 360px;
+.section {
   width: 90%;
   border: 1px solid #000;
   background-color: #fff;
   border-radius: 10px;
   padding: 5px 20px 5px 20px;
+}
+
+#logContainer {
+  overflow: scroll;
+  height: 360px;
 }
 
 .logSuccess {
@@ -23,6 +26,10 @@
 
 .logError {
   color: #a00;
+}
+
+.logWarning {
+  color: #b80;
 }
 
 .logInfo {

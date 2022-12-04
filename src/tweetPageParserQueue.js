@@ -111,9 +111,9 @@ const download = async (parsedTweet) => {
 
 const onTweetPageLoadFailedHandler = (event, parsedTweet) => {
   console.log('-- Failed to load tweet: ', parsedTweet, '---');
-  uiLogger.error(
-    `Failed to parse: ${urlFromTweetIdAndUserHandle(parsedTweet?.tweetId, parsedTweet?.userHandle)}`
-  );
+  const tweetUrl = urlFromTweetIdAndUserHandle(parsedTweet?.tweetId, parsedTweet?.userHandle);
+  uiLogger.error(`Failed to parse: ${tweetUrl}`);
+  fileUtils.appendFailedDownloadsFile(getTargetFolder(), [tweetUrl]);
   // TODO: add to failed.js file
   startNextTaskOrFinishWork();
 };
