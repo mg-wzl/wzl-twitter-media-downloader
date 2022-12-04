@@ -10,26 +10,26 @@ const OBSERVER_TIMEOUT = 5000;
 
 ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
   const waitForTwitPage = () => {
-    const fave = tweetPageTask;
+    const tweetUrl = tweetPageTask.url;
     console.log('preload: received', events.WAIT_FOR_TWEET_PAGE_LOAD);
     console.log('preload: received', tweetPageTask);
     return new Promise((resolve, reject) => {
       // if (parser.isTweetLoaded(document)) {
       if (parser.isTweetImageLoaded(document, tweetPageTask.tweetId)) {
-        const parsedTweet = parser.parseTweetWithDOM(document, fave);
+        const parsedTweet = parser.parseTweetWithDOM(document, tweetUrl);
         return resolve(parsedTweet);
       }
 
       const timeout = setTimeout(() => {
         observer?.disconnect();
-        reject(fave);
+        reject(tweetPageTask);
       }, OBSERVER_TIMEOUT);
 
       const observer = new MutationObserver((mutations) => {
         console.log('mutations:', mutations);
         // if (parser.isTweetLoaded(document)) {
         if (parser.isTweetImageLoaded(document, tweetPageTask.tweetId)) {
-          const parsedTweet = parser.parseTweetWithDOM(document, fave);
+          const parsedTweet = parser.parseTweetWithDOM(document, tweetUrl);
           observer.disconnect();
           if (timeout) {
             clearTimeout(timeout);
@@ -45,7 +45,7 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
           if (timeout) {
             clearTimeout(timeout);
           }
-          reject(fave);
+          reject(tweetPageTask);
         }
       });
 
@@ -56,13 +56,15 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
     });
   };
 
-  waitForTwitPage()
-    .then((tweet) => {
-      console.log('Tweet loaded!', tweet);
-      ipcRenderer.send(events.TWEET_PAGE_LOADED, tweet);
-    })
-    .catch((e) => {
-      console.log('Tweet failed to load!', e);
-      ipcRenderer.send(events.TWEET_FAILED_TO_LOAD, e);
-    });
+  setTimeout(() => {
+    waitForTwitPage()
+      .then((tweet) => {
+        console.log('Tweet loaded!', tweet);
+        ipcRenderer.send(events.TWEET_PAGE_LOADED, tweet);
+      })
+      .catch((e) => {
+        console.log('Tweet failed to load!', e);
+        ipcRenderer.send(events.TWEET_FAILED_TO_LOAD, e);
+      });
+  }, 5000);
 });
