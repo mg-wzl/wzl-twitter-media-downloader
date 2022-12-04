@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+const FINISHED_FILENAME = '___finished.json';
+const FAILED_FILENAME = '___failed.json';
+
 const readOfficialLikesFile = (path) => {
   let rawdata = fs.readFileSync(path);
   let favesList = [];
@@ -17,26 +20,26 @@ const readOfficialLikesFile = (path) => {
   return favesList;
 };
 
-// finished.js will contain an array of tweet ids that are already downloaded in its directory
+// finished.json will contain an array of tweet ids that are already downloaded in its directory
 const readFinishedDownloadsFile = (targetFolder) => {
-  const finishedPath = path.join(targetFolder, 'finished.js');
+  const finishedPath = path.join(targetFolder, FINISHED_FILENAME);
   let finishedIds = [];
   try {
     finishedIds = fs.readFileSync(finishedPath).toString().split('\n');
     console.log('finished Ids count:', finishedIds?.length);
   } catch (e) {
-    console.log('Could not read finished.js:', e);
+    console.log(`Could not read ${FINISHED_FILENAME}:`, e);
   }
   return finishedIds;
 };
 
 const rewriteFinishedDownloadsFile = (targetFolder, finishedIds) => {
-  const finishedPath = path.join(targetFolder, 'finished.js');
+  const finishedPath = path.join(targetFolder, FINISHED_FILENAME);
   try {
-    fs.writeFileSync(finishedPath, finishedIds?.join('\n'));
+    fs.writeFileSync(finishedPath, finishedIds?.join('\n'), {});
     console.log('finished Ids file updated. Count:', finishedIds?.length);
   } catch (e) {
-    console.log('Could not write finished.js:', e);
+    console.log(`Could not write ${FINISHED_FILENAME}:`, e);
   }
   return finishedIds;
 };
