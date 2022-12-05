@@ -31,8 +31,6 @@ const STATUSES = {
   IN_PROGRESS: 'in_progress',
 };
 
-let __win;
-
 let queueStatus = STATUSES.IDLE;
 const queue = [];
 
@@ -65,7 +63,7 @@ const getNextTask = () => {
 const startNextTaskOrFinishWork = () => {
   const task = getNextTask();
   if (task) {
-    startTask(__win, task);
+    startTask(task);
   } else {
     queueStatus = STATUSES.IDLE;
     ipcMain.removeAllListeners(events.TWEET_PAGE_LOADED);
@@ -75,7 +73,7 @@ const startNextTaskOrFinishWork = () => {
   }
 };
 
-const startTask = async (win, task) => {
+const startTask = async (task) => {
   console.log('start task', { task });
   // FIRST we need to try external api. This way we can avoid parsing, which is HUGE
   // const parsedTask = parseTweetUrl(task);
@@ -110,8 +108,6 @@ const startTask = async (win, task) => {
       .catch((e) => console.log('Could not load url:', e));
     parserWindow.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
 
-    // await __win.webContents.loadURL(task.url).catch((e) => console.log('Could not load url:', e));
-    // __win.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
     // TODO: handle cases where the user has no access to tweet
     // TODO: handle cases where the user is suddenly logged out because twitter thinks they're a bot
   }
@@ -141,11 +137,7 @@ const onSessionGotBlockedHandler = (event, parsedTweet) => {
   );
 };
 
-const start = async (win, targetFolder) => {
-  // if (!win) {
-  //   console.log("Download window is empty, can't start!");
-  //   return;
-  // }
+const start = async () => {
   if (queue.length == 0) {
     console.log('Queue is empty - nothing to download');
     return;
@@ -154,7 +146,6 @@ const start = async (win, targetFolder) => {
     console.log("Queue already in progress - can't start");
     return;
   }
-  __win = win;
   ipcMain.on(events.TWEET_PAGE_LOADED, onTweetPageLoadedHandler);
   ipcMain.on(events.TWEET_FAILED_TO_LOAD, onTweetPageLoadFailedHandler);
   ipcMain.on(events.SESSION_GOT_BLOCKED, onSessionGotBlockedHandler);
