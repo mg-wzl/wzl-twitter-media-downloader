@@ -1,6 +1,9 @@
 const { BrowserWindow } = require('electron');
 const path = require('path');
 const uiLogger = require('./utils/uiLogger');
+const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main');
+
+setupTitlebar();
 
 const ANONYMOUS_WINDOW_ARG = '--anonymous-window';
 const ANONYMOUS_SESSION_PARTITION = 'anonymous';
@@ -63,6 +66,7 @@ const openSingleTweetWindowInner = (isAnonymous) => {
       width: 1200,
       height: 900,
       title: `Twitter parser${isAnonymous ? ' - anonymous' : ''}`,
+      titleBarStyle: 'hidden',
       webPreferences: {
         // find the way to control DOM of the external page
         sandbox: false,
@@ -74,6 +78,8 @@ const openSingleTweetWindowInner = (isAnonymous) => {
     });
     targetWindow.loadFile(path.join(__dirname, 'screens', 'empty.html'));
     targetWindow.webContents.openDevTools();
+
+    attachTitlebarToWindow(targetWindow);
     return targetWindow;
     // if (isAnonymous) {
     //   anonSingleTweetWindow = targetWindow;

@@ -5,8 +5,23 @@ const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const { ANONYMOUS_WINDOW_ARG } = require('../../windowManager');
+const { Titlebar, Color } = require('custom-electron-titlebar');
 
 const OBSERVER_TIMEOUT = 5000;
+
+const isAnonymous = () => window.process?.argv?.includes(ANONYMOUS_WINDOW_ARG);
+
+let titleBar;
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Custom Title bar implemenation
+  console.log('updatingtitle');
+  const isAnon = isAnonymous();
+  titleBar = new Titlebar({
+    backgroundColor: isAnon ? Color.fromHex('#900') : Color.fromHex('#457'),
+  });
+  titleBar.updateTitle(`${isAnon ? '(Anonymous) ' : ''}Parser: ${window.location.href}`);
+});
 
 ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
   const waitForTwitPage = () => {
@@ -65,8 +80,7 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
       })
       .catch((e) => {
         console.log('Tweet failed to load!', e);
-        const isAnonymousWindow = window.process?.argv?.includes(ANONYMOUS_WINDOW_ARG);
-        if (isAnonymousWindow) {
+        if (isAnonymous()) {
           console.log('Anonymous window failed to parse the tweet - try in non-anonymous window.');
           ipcRenderer.send(events.TWEET_FAILED_TO_LOAD_ANONYMOUSLY, {
             error: e,
