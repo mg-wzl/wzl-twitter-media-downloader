@@ -2,6 +2,7 @@ const { BrowserWindow } = require('electron');
 const path = require('path');
 const { download } = require('electron-dl');
 const windowManager = require('../windowManager');
+const uiLogger = require('./uiLogger');
 
 const downloadImage = async (url, name, extension, targetFolder) => {
   // console.log('Download image()', { url, name, extension, targetFolder });
@@ -13,6 +14,8 @@ const downloadImage = async (url, name, extension, targetFolder) => {
     filename,
     onProgress: (progress) =>
       console.log(`${filename}: ${progress.transferredBytes}/${progress.totalBytes} bytes`),
+  }).catch((error) => {
+    uiLogger.error(error);
   });
   if (result?.getState() === 'completed') {
     return true;
