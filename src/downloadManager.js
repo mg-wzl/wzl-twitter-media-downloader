@@ -10,6 +10,43 @@ const MAX_BUFFER_SIZE = 15; // will wait until this number of downloads is compl
 let finishedDownloads = [];
 let finishedDownloadsBuffer = [];
 
+class DownloadTask {
+  constructor(tweetId, userHandle, datetime, mediaFiles) {
+    this.tweetId = tweetId;
+    this.userHandle = userHandle;
+    this.datetime = datetime;
+    this.mediaFiles = mediaFiles;
+  }
+
+  static fromParsedTweetsList(parsedTweets) {
+    const result = [];
+    if (Array.isArray(parsedTweets)) {
+      const tweetsWithMedia = parsedTweets.filter(
+        (tweet) => tweet?.media && (tweet?.media?.images || tweet?.media?.video)
+      );
+      tweetsWithMedia.forEach((tweet) => {
+        const mediaFiles = [];
+        if (tweet?.media?.images?.length) {
+          tweet?.media?.images.forEach((url) => {
+            if (url) {
+              mediaFiles.push({ url, extension: stringUtils.getFileExtensionFromUrl(url) });
+            }
+          });
+        }
+        if (tweet?.media?.video?.src) {
+          mediaFiles.push({
+            url: tweet?.media?.video?.src,
+            extension: stringUtils.getFileExtensionFromUrl(tweet?.media?.video?.srcl),
+          });
+        }
+        const task = new DownloadTask(tweet.tweetId, tweet.userHandle, tweet.datetime, mediaFiles);
+        result.push(task);
+      });
+    }
+    return result;
+  }
+}
+
 const isInFinishedDownloads = (tweetId) => {
   if (finishedDownloads?.length === 0 && finishedDownloadsBuffer.length === 0) {
     finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
@@ -18,15 +55,19 @@ const isInFinishedDownloads = (tweetId) => {
 };
 
 // TODO; change to supporting array of parsed tweets
-const runDownloads = async (parsedTweet) => {
+// parsedTweet must have: mediaFiles: [{url, extension}]
+const runDownloads = async (downloadTask) => {
   console.log('runDownloads()', events.TWEET_PAGE_LOADED);
   const tweetUrl = stringUtils.urlFromTweetIdAndUserHandle(
-    parsedTweet?.tweetId,
-    parsedTweet?.userHandle
+    downloadTask?.tweetId,
+    downloadTask?.userHandle
   );
-  const noFailedDownloads = await downloadUtils.downloadTweetImages(parsedTweet, getTargetFolder());
+  const noFailedDownloads = await downloadUtils.downloadTweetImages(
+    downloadTask,
+    getTargetFolder()
+  );
   if (noFailedDownloads) {
-    finishedDownloadsBuffer.push(parsedTweet.tweetId);
+    finishedDownloadsBuffer.push(downloadTask.tweetId);
     uiLogger.success(
       `#${finishedDownloads.length + finishedDownloadsBuffer.length} Downloaded: ${tweetUrl}`
     );
@@ -47,4 +88,5 @@ const runDownloads = async (parsedTweet) => {
 module.exports = {
   isInFinishedDownloads,
   runDownloads,
+  DownloadTask,
 };

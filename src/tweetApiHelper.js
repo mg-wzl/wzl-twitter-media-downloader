@@ -56,7 +56,7 @@ const getMedia = async (tweetData) => {
 const combineTweet = async (tweetData) => {
   const generalInfo = getGeneralTweetInfo(tweetData);
   const media = await getMedia(tweetData);
-  return { ...generalInfo, images: media };
+  return { ...generalInfo, mediaFiles: media };
 };
 
 const fetchTweetContent = (tweetId) => {

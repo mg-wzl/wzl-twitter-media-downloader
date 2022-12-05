@@ -36,13 +36,14 @@ const getFileName = (tweetContent, image, index) => {
   return fileName;
 };
 
+// tweetContent must have: mediaFiles: [{url, extension}]
 const downloadTweetImages = async (tweetContent, targetFolder) => {
-  console.log('Download images', { tweetContent, targetFolder });
+  console.log('Download media files', { tweetContent, targetFolder });
   let noFailedDownloads = false;
-  if (tweetContent.images) {
+  if (tweetContent.mediaFiles) {
     noFailedDownloads = true;
-    for (const i in tweetContent.images) {
-      const image = tweetContent.images[i];
+    for (const i in tweetContent.mediaFiles) {
+      const image = tweetContent.mediaFiles[i];
       if (image && image.url && image.extension) {
         let fileName = getFileName(tweetContent, image, i);
         const isCompleted = await downloadImage(image.url, fileName, image.extension, targetFolder);

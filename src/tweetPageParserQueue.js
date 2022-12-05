@@ -93,9 +93,16 @@ const startTask = async (task) => {
         e?.response?.statusText
       )
     );
-  console.log('API RESULT!!!', { apiResult, images: apiResult?.[0].images });
+  console.log('API RESULT!!!', { apiResult, mediaFiles: apiResult?.[0].mediaFiles });
   if (apiResult?.length) {
-    download(apiResult[0]); // TODO: change to passing whole array
+    download(
+      new downloadManager.DownloadTask(
+        apiResult[0].tweetId,
+        apiResult[0].userHandle,
+        apiResult[0].datetime,
+        apiResult[0].mediaFiles
+      )
+    ); // TODO: change to passing whole array
   } else {
     console.log('Start page scraping:', task);
     // API could not get the tweet data. The tweet might might be protected or the API isn't responding
@@ -110,7 +117,14 @@ const startTask = async (task) => {
 };
 
 const onTweetPageLoadedHandler = (event, parsedTweet) => {
-  download(parsedTweet);
+  download(
+    new downloadManager.DownloadTask(
+      parsedTweet.tweetId,
+      parsedTweet.userHandle,
+      parsedTweet.datetime,
+      parsedTweet.mediaFiles
+    )
+  );
 };
 
 const download = async (parsedTweet) => {

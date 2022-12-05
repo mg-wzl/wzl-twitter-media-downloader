@@ -105,7 +105,7 @@ const parseTweetWithDOM = (tweetPageDocument, link) => {
     console.log('getImageUrls');
     images = getImageUrls(tweetPageDocument, tweetInfo.tweetId, tweetInfo.userHandle);
   }
-  return { ...tweetInfo, images };
+  return { ...tweetInfo, mediaFiles: images };
 };
 
 // not reliable
