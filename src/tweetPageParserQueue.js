@@ -7,6 +7,7 @@ const { getTargetFolder } = require('./fileManager');
 const { parseTweetUrl, urlFromTweetIdAndUserHandle } = require('./utils/stringUtils');
 const uiLogger = require('./utils/uiLogger');
 const downloadManager = require('./downloadManager');
+const windowManager = require('./windowManager');
 
 class TweetPageTask {
   constructor(url, isProtected) {
@@ -19,7 +20,7 @@ class TweetPageTask {
   static fromOfficialLikesList = (urlList) => {
     const result = [];
     if (Array.isArray(urlList)) {
-      urlList.forEach((url) => result.push(new TweetPageTask(url)));
+      urlList.forEach((url, index) => result.push(new TweetPageTask(url)));
     }
     return result;
   };
@@ -93,8 +94,24 @@ const startTask = async (win, task) => {
   } else {
     console.log('Start page scraping:', task);
     // API could not get the tweet data. The tweet might might be protected or the API isn't responding
-    await __win.webContents.loadURL(task.url).catch((e) => console.log('Could not load url:', e));
-    __win.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
+
+    let parserWindow;
+    if (task?.isProtected === null || task?.isProtected === undefined) {
+      console.log('task isProtected property not set - use window with session');
+      parserWindow = windowManager.getSingleTweetWindow();
+    } else {
+      parserWindow = task.isProtected
+        ? windowManager.getSingleTweetWindow()
+        : windowManager.getAnonSingleTweetWindow();
+    }
+
+    await parserWindow.webContents
+      .loadURL(task.url)
+      .catch((e) => console.log('Could not load url:', e));
+    parserWindow.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
+
+    // await __win.webContents.loadURL(task.url).catch((e) => console.log('Could not load url:', e));
+    // __win.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
     // TODO: handle cases where the user has no access to tweet
     // TODO: handle cases where the user is suddenly logged out because twitter thinks they're a bot
   }
@@ -125,10 +142,10 @@ const onSessionGotBlockedHandler = (event, parsedTweet) => {
 };
 
 const start = async (win, targetFolder) => {
-  if (!win) {
-    console.log("Download window is empty, can't start!");
-    return;
-  }
+  // if (!win) {
+  //   console.log("Download window is empty, can't start!");
+  //   return;
+  // }
   if (queue.length == 0) {
     console.log('Queue is empty - nothing to download');
     return;

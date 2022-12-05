@@ -17,10 +17,6 @@ const getToolsWindow = () => toolsWindow;
 
 const getWebWindow = () => webWindow;
 
-const getSingleTweetWindow = () => singleTweetWindow;
-
-const getAnonSingleTweetWindow = () => anonSingleTweetWindow;
-
 const openToolsWindow = () => {
   toolsWindow = new BrowserWindow({
     width: 800,
@@ -58,12 +54,14 @@ const openWebWindow = () => {
 
 const openSingleTweetWindowInner = (isAnonymous) => {
   let targetWindow = isAnonymous ? anonSingleTweetWindow : singleTweetWindow;
-  if (!targetWindow) {
+  if (targetWindow) {
+    return targetWindow;
+  } else {
     targetWindow = new BrowserWindow({
       show: true,
       width: 1200,
       height: 900,
-      title: 'Twitter',
+      title: `Twitter parser${isAnonymous ? ' - anonymous' : ''}`,
       webPreferences: {
         // find the way to control DOM of the external page
         sandbox: false,
@@ -73,13 +71,13 @@ const openSingleTweetWindowInner = (isAnonymous) => {
       },
     });
     targetWindow.loadFile(path.join(__dirname, 'screens', 'empty.html'));
-    targetWindow.on('closed', () => (targetWindow = null));
     targetWindow.webContents.openDevTools();
-    if (isAnonymous) {
-      anonSingleTweetWindow = targetWindow;
-    } else {
-      singleTweetWindow = targetWindow;
-    }
+    return targetWindow;
+    // if (isAnonymous) {
+    //   anonSingleTweetWindow = targetWindow;
+    // } else {
+    //   singleTweetWindow = targetWindow;
+    // }
   }
 };
 
@@ -108,11 +106,27 @@ const closeDownloaderWindow = () => {
 };
 
 const openSingleTweetWindow = () => {
-  openSingleTweetWindowInner(false);
+  singleTweetWindow = openSingleTweetWindowInner(false);
+  singleTweetWindow.on('closed', () => (singleTweetWindow = null));
 };
 
 const openAnonSingleTweetWindow = () => {
-  openSingleTweetWindowInner(true);
+  anonSingleTweetWindow = openSingleTweetWindowInner(true);
+  anonSingleTweetWindow.on('closed', () => (anonSingleTweetWindow = null));
+};
+
+const getSingleTweetWindow = () => {
+  if (!singleTweetWindow) {
+    openSingleTweetWindow();
+  }
+  return singleTweetWindow;
+};
+
+const getAnonSingleTweetWindow = () => {
+  if (!anonSingleTweetWindow) {
+    openAnonSingleTweetWindow();
+  }
+  return anonSingleTweetWindow;
 };
 
 module.exports = {

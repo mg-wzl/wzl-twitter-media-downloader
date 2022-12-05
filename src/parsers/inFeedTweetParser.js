@@ -101,7 +101,7 @@ const parseVideo = (tweetContainer, quoted) => {
 };
 
 const parseTweet = (tweetContainer, mediaContainer, quoted) => {
-  const protected = parseIsTweetProtected(tweetContainer);
+  const isProtected = parseIsTweetProtected(tweetContainer);
   let images = null,
     video = null,
     card = null;
@@ -128,8 +128,8 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
   const { avatar } = parseUserAvatar(tweetContainer);
 
   let result = { type, userHandle, tweetId, url, dateTime, avatar };
-  if (protected) {
-    result = { ...result, protected };
+  if (isProtected) {
+    result = { ...result, isProtected };
   }
   if (quoted) {
     result = { ...result, quoted };

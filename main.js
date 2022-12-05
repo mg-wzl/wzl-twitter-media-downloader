@@ -77,15 +77,12 @@ const setupHandlers = () => {
   });
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
-    windowManager.openSingleTweetWindow();
-    // windowManager.openAnonSingleTweetWindow();
     console.log(events.DOWNLOAD_FAVES_CLICKED);
     const favesList = readOfficialLikesFile(getFavesFilePath());
     tweetPageParserQueue.addTasks(
       tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(favesList)
     );
-    tweetPageParserQueue.start(windowManager.getSingleTweetWindow());
-    // downloadManager.start(windowManager.getAnonSingleTweetWindow());
+    tweetPageParserQueue.start();
   });
 };
 
