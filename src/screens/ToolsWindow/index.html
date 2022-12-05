@@ -9,31 +9,39 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <p id="info"></p>
-    <p></p>
+    <span class="sectionTitle">Download media</span>
     <div class="section">
-      <p>
+      <div class="row">
         <button id="pickFolderButton">Pick target folder</button>
         <span id="targetFolder">[Not selected]</span>
-      </p>
-      <p>
+      </div>
+      <div class="row">
         <button id="pickFavesFileButton">Pick faves file</button>
         <span id="favesFile">[Not selected]</span>
-      </p>
-      <p id="targetFolder">
-        Important! Must be JSON array file. Remove anything before first [ symbol
-      </p>
+        <div class="rowSubtext" id="targetFolder">
+          Important! Must be JSON array file. Remove anything before first [ symbol
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="openTwitterButton">Sign-in / Scan Window</button>
+        <div class="rowSubtext">
+          You'll need to log into Twitter to be able to parse locked and 18+ tweets - feel free to
+          close it afterwards
+        </div>
+      </div>
+
+      <br />
+      <button class="row" id="downloadFavesButton">Download Faves</button>
     </div>
-    <br />
-    <button id="clearCookiesButton">Clear Cookies</button>
+
+    <span class="sectionTitle">Extras</span>
+    <div class="section">
+      <button class="row" id="clearCookiesButton">Clear Cookies</button>
+    </div>
+
     <br /><br />
-    <button id="openTwitterButton">Open Twitter Window</button>
-    <p>
-      You'll need to log into Twitter to be able to parse locked and 18+ tweets - feel free to close
-      it afterwards
-    </p>
-    <br />
-    <button id="downloadFavesButton">Download Faves</button>
+
     <br />
     <br />
     <span class="sectionTitle">Log</span>

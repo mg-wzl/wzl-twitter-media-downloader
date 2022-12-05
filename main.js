@@ -22,7 +22,7 @@ contextMenu({
   showCopyLink: true,
   prepend: (defaultActions, parameters, browserWindow) => [
     {
-      label: 'Scroll to bottom',
+      label: 'Scan for media links',
       visible: browserWindow?.id === windowManager?.getWebWindow()?.id,
       click: () => {
         const webWindow = windowManager?.getWebWindow();

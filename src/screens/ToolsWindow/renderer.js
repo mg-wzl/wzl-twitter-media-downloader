@@ -1,5 +1,4 @@
 const information = document.getElementById('info');
-information.innerText = `This app automates saving images from your Twitter faves into your local folder`;
 
 document.querySelector('#pickFolderButton').addEventListener('click', async () => {
   const folder = await window.on.pickTargetFolderClicked();
