@@ -4,6 +4,7 @@ const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
+const { ANONYMOUS_WINDOW_ARG } = require('../../windowManager');
 
 const OBSERVER_TIMEOUT = 5000;
 
@@ -64,7 +65,16 @@ ipcRenderer.on(events.WAIT_FOR_TWEET_PAGE_LOAD, (event, tweetPageTask) => {
       })
       .catch((e) => {
         console.log('Tweet failed to load!', e);
-        ipcRenderer.send(events.TWEET_FAILED_TO_LOAD, e);
+        const isAnonymousWindow = window.process?.argv?.includes(ANONYMOUS_WINDOW_ARG);
+        if (isAnonymousWindow) {
+          console.log('Anonymous window failed to parse the tweet - try in non-anonymous window.');
+          ipcRenderer.send(events.TWEET_FAILED_TO_LOAD_ANONYMOUSLY, {
+            error: e,
+            task: tweetPageTask,
+          });
+        } else {
+          ipcRenderer.send(events.TWEET_FAILED_TO_LOAD, { error: e, task: tweetPageTask });
+        }
       });
   }, 1000);
 });

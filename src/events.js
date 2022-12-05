@@ -10,5 +10,6 @@ module.exports = Object.freeze({
   WAIT_FOR_TWEET_PAGE_LOAD: 'waitForTweetPageLoad',
   TWEET_PAGE_LOADED: 'tweetPageLoaded',
   TWEET_FAILED_TO_LOAD: 'tweetFailedToLoad',
+  TWEET_FAILED_TO_LOAD_ANONYMOUSLY: 'tweetFailedToLoadAnonymously',
   SESSION_GOT_BLOCKED: 'sessionGotBlocked',
 });

@@ -2,6 +2,7 @@ const { BrowserWindow } = require('electron');
 const path = require('path');
 const uiLogger = require('./utils/uiLogger');
 
+const ANONYMOUS_WINDOW_ARG = '--anonymous-window';
 const ANONYMOUS_SESSION_PARTITION = 'anonymous';
 
 // only to be used from main thread
@@ -68,6 +69,7 @@ const openSingleTweetWindowInner = (isAnonymous) => {
         preload: path.join(__dirname, 'screens', 'SingleTweetWindow', 'preload.js'),
         backgroundThrottling: false,
         partition: isAnonymous ? ANONYMOUS_SESSION_PARTITION : undefined,
+        additionalArguments: isAnonymous ? [ANONYMOUS_WINDOW_ARG] : undefined,
       },
     });
     targetWindow.loadFile(path.join(__dirname, 'screens', 'empty.html'));
@@ -130,6 +132,7 @@ const getAnonSingleTweetWindow = () => {
 };
 
 module.exports = {
+  ANONYMOUS_WINDOW_ARG,
   openWebWindow,
   getWebWindow,
   openToolsWindow,

@@ -73,6 +73,13 @@ const startNextTaskOrFinishWork = () => {
   }
 };
 
+const sendTweetTaskToWindow = async (parserWindow, task) => {
+  await parserWindow.webContents
+    .loadURL(task.url)
+    .catch((e) => console.log('Could not load url:', e));
+  parserWindow.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
+};
+
 const startTask = async (task) => {
   console.log('start task', { task });
   // FIRST we need to try external api. This way we can avoid parsing, which is HUGE
@@ -92,21 +99,10 @@ const startTask = async (task) => {
   } else {
     console.log('Start page scraping:', task);
     // API could not get the tweet data. The tweet might might be protected or the API isn't responding
-
-    let parserWindow;
-    if (task?.isProtected === null || task?.isProtected === undefined) {
-      console.log('task isProtected property not set - use window with session');
-      parserWindow = windowManager.getSingleTweetWindow();
-    } else {
-      parserWindow = task.isProtected
-        ? windowManager.getSingleTweetWindow()
-        : windowManager.getAnonSingleTweetWindow();
-    }
-
-    await parserWindow.webContents
-      .loadURL(task.url)
-      .catch((e) => console.log('Could not load url:', e));
-    parserWindow.send(events.WAIT_FOR_TWEET_PAGE_LOAD, task);
+    const parserWindow = task.isProtected
+      ? windowManager.getSingleTweetWindow()
+      : windowManager.getAnonSingleTweetWindow();
+    sendTweetTaskToWindow(parserWindow, task);
 
     // TODO: handle cases where the user has no access to tweet
     // TODO: handle cases where the user is suddenly logged out because twitter thinks they're a bot
@@ -122,9 +118,14 @@ const download = async (parsedTweet) => {
   startNextTaskOrFinishWork();
 };
 
-const onTweetPageLoadFailedHandler = (event, parsedTweet) => {
-  console.log('-- Failed to load tweet: ', parsedTweet, '---');
-  const tweetUrl = urlFromTweetIdAndUserHandle(parsedTweet?.tweetId, parsedTweet?.userHandle);
+const onTweetPageLoadFailedAnonymously = (event, { error, task }) => {
+  console.log('-- Failed to load tweet anonymously ', task, '---');
+  sendTweetTaskToWindow(windowManager.getSingleTweetWindow(), task);
+};
+
+const onTweetPageLoadFailedHandler = (event, { error, task }) => {
+  console.log('-- Failed to load tweet: ', task, '---');
+  const tweetUrl = urlFromTweetIdAndUserHandle(task?.tweetId, task?.userHandle);
   uiLogger.error(`Failed to parse: ${tweetUrl}`);
   fileUtils.appendFailedDownloadsFile(getTargetFolder(), [tweetUrl]);
   // TODO: add to failed.js file
@@ -148,6 +149,7 @@ const start = async () => {
   }
   ipcMain.on(events.TWEET_PAGE_LOADED, onTweetPageLoadedHandler);
   ipcMain.on(events.TWEET_FAILED_TO_LOAD, onTweetPageLoadFailedHandler);
+  ipcMain.on(events.TWEET_FAILED_TO_LOAD_ANONYMOUSLY, onTweetPageLoadFailedAnonymously);
   ipcMain.on(events.SESSION_GOT_BLOCKED, onSessionGotBlockedHandler);
   queueStatus = STATUSES.IN_PROGRESS;
   console.log('TargetFolder:', getTargetFolder());
