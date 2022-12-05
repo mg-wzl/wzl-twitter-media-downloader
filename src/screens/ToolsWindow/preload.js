@@ -12,6 +12,9 @@ contextBridge.exposeInMainWorld('on', {
   clearCookiesClicked: () => {
     return ipcRenderer.invoke(events.CLEAR_COOKIES_CLICKED);
   },
+  clearLogClicked: () => {
+    document.getElementById('logContainer').innerHTML = '';
+  },
   downloadFavesClicked: () => {
     return ipcRenderer.invoke(events.DOWNLOAD_FAVES_CLICKED);
   },

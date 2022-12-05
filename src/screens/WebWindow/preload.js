@@ -53,7 +53,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
           if (parsed && !linksArray.find((v) => v.tweetId === parsed.tweetId)) {
             linksArray.push(parsed);
             console.log(`${linksArray.length}:`, parsed);
-            uiLogger.success(`${linksArray.length}: ${parsed.url}`);
+            uiLogger.success(`Parsed: ${linksArray.length}: ${parsed.url}`);
           }
         });
       }

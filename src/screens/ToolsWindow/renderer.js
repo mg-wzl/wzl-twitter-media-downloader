@@ -18,6 +18,10 @@ document.querySelector('#clearCookiesButton').addEventListener('click', () => {
   window.on.clearCookiesClicked();
 });
 
+document.querySelector('#clearLogButton').addEventListener('click', () => {
+  window.on.clearLogClicked();
+});
+
 document.querySelector('#openTwitterButton').addEventListener('click', () => {
   window.on.twitterLoginClicked();
 });

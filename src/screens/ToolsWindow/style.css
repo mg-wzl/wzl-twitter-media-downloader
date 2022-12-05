@@ -2,8 +2,11 @@
   margin: 10px 0 15px 0;
 }
 
+button {
+  margin: 5px 10px 5px 0;
+}
+
 .rowSubtext {
-  margin-top: 5px;
   font-size: 0.9em;
 }
 

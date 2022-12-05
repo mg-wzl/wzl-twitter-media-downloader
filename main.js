@@ -49,6 +49,7 @@ const setupHandlers = () => {
     console.log(events.PICK_TARGET_FOLDER_CLICKED);
     const { canceled, filePaths } = await dialog.showOpenDialog(windowManager?.getToolsWindow(), {
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
+      filters: [{ name: 'Tweet data files', extensions: ['json', 'js', 'txt'] }],
     });
     console.log('Target folder: ', { canceled, filePaths });
     if (canceled) {
@@ -63,6 +64,7 @@ const setupHandlers = () => {
     console.log(events.PICK_FAVES_FILE_CLICKED);
     const { canceled, filePaths } = await dialog.showOpenDialog(windowManager?.getToolsWindow(), {
       properties: ['openFile'],
+      filters: [{ name: 'Tweet data files', extensions: ['json', 'js', 'txt'] }],
     });
     console.log('Faves file: ', { canceled, filePaths });
     if (canceled) {
