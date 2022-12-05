@@ -105,21 +105,20 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
   let images = null,
     video = null,
     card = null;
-  let type = TYPE_MEDIA;
+  let mediaType = TYPE_MEDIA;
   if (mediaContainer) {
     images = parseImages(mediaContainer, quoted);
     video = parseVideo(mediaContainer, quoted);
     card = parseCard(mediaContainer);
   }
-  let tweetText;
+  let tweetText = parseText(tweetContainer);
   if (!(images || video)) {
     // we don't need tweets with no media
     // check if the tweet has a youtube link in it
-    tweetText = parseText(tweetContainer);
     if (!card?.hasYoutube && !tweetText?.hasYoutube) {
       return null;
     }
-    type = TYPE_YOUTUBE;
+    mediaType = TYPE_YOUTUBE;
   }
 
   const { url, tweetId, dateTime, userHandle } = !quoted
@@ -127,18 +126,26 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
     : parseQuotedTweetUrlAndDatetime(tweetContainer);
   const { avatar } = parseUserAvatar(tweetContainer);
 
-  let result = { type, userHandle, tweetId, url, dateTime, avatar };
+  let result = {
+    mediaType,
+    userHandle,
+    tweetId,
+    url,
+    dateTime,
+    avatar,
+    text: tweetText.text,
+    card,
+  };
   if (isProtected) {
     result = { ...result, isProtected };
   }
   if (quoted) {
     result = { ...result, quoted };
   }
-  if (type === TYPE_MEDIA) {
-    return { ...result, images, video };
-  } else if (type === TYPE_YOUTUBE) {
-    return { ...result, text: tweetText.text, card };
+  if (mediaType === TYPE_MEDIA) {
+    result = { ...result, media: { images, video } };
   }
+  return result;
 };
 
 const parseComplexTweet = (tweetContainer) => {

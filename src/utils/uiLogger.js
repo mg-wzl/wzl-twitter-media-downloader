@@ -30,20 +30,32 @@ const sendMessage = (logLevel, msg) => {
   }
 };
 
-const success = (msg) => {
+const success = (msg, repeatInConsole) => {
   sendMessage(LogLevel.SUCCESS, msg);
+  if (repeatInConsole) {
+    console.log(msg);
+  }
 };
 
-const error = (msg) => {
+const error = (msg, repeatInConsole) => {
   sendMessage(LogLevel.ERROR, msg);
+  if (repeatInConsole) {
+    console.error(msg);
+  }
 };
 
-const warning = (msg) => {
+const warn = (msg, repeatInConsole) => {
   sendMessage(LogLevel.WARNING, msg);
+  if (repeatInConsole) {
+    console.warn(msg);
+  }
 };
 
-const info = (msg) => {
+const info = (msg, repeatInConsole) => {
   sendMessage(LogLevel.INFO, msg);
+  if (repeatInConsole) {
+    console.info(msg);
+  }
 };
 
 module.exports = {
@@ -52,6 +64,6 @@ module.exports = {
   LogLevel,
   success,
   error,
-  warning,
+  warn,
   info,
 };

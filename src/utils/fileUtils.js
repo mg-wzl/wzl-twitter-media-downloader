@@ -4,20 +4,32 @@ const path = require('path');
 const FINISHED_FILENAME = '___finished.json';
 const FAILED_FILENAME = '___failed.json';
 
-const readOfficialLikesFile = (path) => {
+const FileType = {
+  UNKNOWN: 'unknown',
+  OFFICIAL: 'official',
+  PARSED: 'parsed',
+};
+
+const readTweetsListFile = (path) => {
   let rawdata = fs.readFileSync(path);
   let favesList = [];
+  let fileType = FileType.UNKNOWN;
   try {
     const favesObj = JSON.parse(rawdata);
+
+    // detect file type
+    if (!!favesObj?.[0]?.like && !!favesObj?.[0].like.expandedUrl) {
+      fileType = FileType.OFFICIAL;
+    } else if (!!favesObj?.[0]?.mediaType && !!favesObj?.[0]?.url) {
+      fileType = FileType.PARSED;
+    }
+
     favesList = favesObj.map((v) => v?.like?.expandedUrl);
   } catch (e) {
     console.log('Not a valid JSON file.', e);
   }
-  // console.log('Faves >>>>');
-  // console.log(favesList);
-  // console.log('<<<< Faves');
 
-  return favesList;
+  return { favesList, fileType };
 };
 
 const writeJsonFile = (data, targetFolder, fileName) => {
@@ -84,9 +96,10 @@ const appendFailedDownloadsFile = (targetFolder, failedUrls) => {
 };
 
 module.exports = {
-  readOfficialLikesFile,
+  readTweetsListFile,
   readFinishedDownloadsFile,
   rewriteFinishedDownloadsFile,
   writeJsonFile,
   appendFailedDownloadsFile,
+  FileType,
 };

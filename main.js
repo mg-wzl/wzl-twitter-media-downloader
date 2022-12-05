@@ -11,7 +11,7 @@ const {
   setFavesFilePath,
   getFavesFilePath,
 } = require('./src/fileManager');
-const { readOfficialLikesFile } = require('./src/utils/fileUtils');
+const { readTweetsListFile, FileType } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
 
@@ -86,11 +86,24 @@ const setupHandlers = () => {
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
     console.log(events.DOWNLOAD_FAVES_CLICKED);
-    const favesList = readOfficialLikesFile(getFavesFilePath());
-    tweetPageParserQueue.addTasks(
-      tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(favesList)
-    );
-    tweetPageParserQueue.start();
+    const { favesList, fileType } = readTweetsListFile(getFavesFilePath());
+    if (fileType === FileType.UNKNOWN) {
+      uiLogger.error(`Unknown file format: ${getFavesFilePath()}`, true);
+      return;
+    }
+    if (fileType === FileType.OFFICIAL) {
+      uiLogger.info(`Official Twitter likes file loaded: ${getFavesFilePath()}`, true);
+      tweetPageParserQueue.addTasks(
+        tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(favesList)
+      );
+      tweetPageParserQueue.start();
+    }
+    if (fileType === FileType.PARSED) {
+      console.log(`Parsed tweets file loaded: ${getFavesFilePath()}`);
+    }
+    // console.log('Faves >>>>');
+    // console.log(favesList);
+    // console.log('<<<< Faves');
   });
 };
 
