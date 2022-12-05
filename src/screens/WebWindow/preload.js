@@ -6,6 +6,8 @@ const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const uiLogger = require('../../utils/uiLogger');
 
+ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {});
+
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   console.log('preload:', events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, { args });
   const { targetFolder, url } = args;

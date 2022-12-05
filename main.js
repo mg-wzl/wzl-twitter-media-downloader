@@ -32,6 +32,14 @@ contextMenu({
         });
       },
     },
+    {
+      label: 'Stop scanning',
+      visible: browserWindow?.id === windowManager?.getWebWindow()?.id,
+      click: () => {
+        const webWindow = windowManager?.getWebWindow();
+        webWindow?.send(events.CONTEXT_MENU_STOP_SCRAPING);
+      },
+    },
   ],
 });
 

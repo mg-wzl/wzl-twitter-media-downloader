@@ -6,6 +6,7 @@ module.exports = Object.freeze({
   OPEN_TWITTER_WINDOW_CLICKED: 'button:twitterLoginClicked',
 
   CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED: 'contextMenu:scrollAndScrape',
+  CONTEXT_MENU_STOP_SCRAPING: 'contextMenu:stopScraping',
 
   WAIT_FOR_TWEET_PAGE_LOAD: 'waitForTweetPageLoad',
   TWEET_PAGE_LOADED: 'tweetPageLoaded',
