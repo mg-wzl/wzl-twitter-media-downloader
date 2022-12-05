@@ -5,16 +5,26 @@ const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const uiLogger = require('../../utils/uiLogger');
+const { PageLoadingWorker } = require('../../PageLoadingWorker');
 
-ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {});
+let pageLoadingWorker;
+
+ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {
+  if (pageLoadingWorker) {
+    pageLoadingWorker.finish();
+  }
+});
 
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
+  if (pageLoadingWorker) {
+    // already in progress, don't initiate it until stopped
+    return;
+  }
   console.log('preload:', events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, { args });
   const { targetFolder, url } = args;
   const startTime = new Date().getTime();
   const SCROLL_INTERVAL = 600;
   const NEW_MUTATIONS_TIMEOUT = 5000;
-  let containerHasMutations = false;
   const linksArray = [];
 
   if (!targetFolder) {
@@ -28,16 +38,10 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
     return;
   }
 
-  const observer = new MutationObserver((mutations) => {
-    containerHasMutations = true;
-  });
-  observer.observe(tweetsContainer, {
-    childList: true,
-    subtree: true,
-  });
+  const isLoading = () => parser.isProgressCircleVisible(document);
 
   const scrollDownAndScrape = () => {
-    if (parser.isProgressCircleVisible(document)) {
+    if (isLoading()) {
       return;
     }
 
@@ -61,26 +65,24 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
     });
   };
 
-  const scraperIntervalId = setInterval(scrollDownAndScrape, SCROLL_INTERVAL);
+  const onFinished = () => {
+    console.log(
+      `Colected ${linksArray.lengthFinished} links in ${
+        (new Date().getTime() - startTime) / 1000
+      } seconds`
+    );
+    console.log('Total links scraped:', linksArray.length);
+    writeJsonFile(linksArray, targetFolder, scrapedFileNameFromUrl(url));
+    pageLoadingWorker = null;
+  };
 
-  const checkIntervalId = setInterval(() => {
-    if (parser.isProgressCircleVisible(document)) {
-      return;
-    }
-    if (containerHasMutations) {
-      scrollDownAndScrape();
-      containerHasMutations = false;
-    } else {
-      clearInterval(checkIntervalId);
-      clearInterval(scraperIntervalId);
-      observer.disconnect();
-      console.log(
-        `Colected ${linksArray.lengthFinished} links in ${
-          (new Date().getTime() - startTime) / 1000
-        } seconds`
-      );
-      console.log('Total links scraped:', linksArray.length);
-      writeJsonFile(linksArray, targetFolder, scrapedFileNameFromUrl(url));
-    }
-  }, NEW_MUTATIONS_TIMEOUT);
+  pageLoadingWorker = new PageLoadingWorker(
+    tweetsContainer,
+    () => isLoading(),
+    scrollDownAndScrape,
+    onFinished,
+    SCROLL_INTERVAL,
+    NEW_MUTATIONS_TIMEOUT
+  );
+  pageLoadingWorker.start();
 });
