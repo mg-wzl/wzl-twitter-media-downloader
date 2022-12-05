@@ -11,9 +11,10 @@ let finishedDownloads = [];
 let finishedDownloadsBuffer = [];
 
 class DownloadTask {
-  constructor(tweetId, userHandle, datetime, mediaFiles) {
+  constructor(tweetId, userHandle, url, datetime, mediaFiles) {
     this.tweetId = tweetId;
     this.userHandle = userHandle;
+    this.url = url;
     this.datetime = datetime;
     this.mediaFiles = mediaFiles;
   }
@@ -39,7 +40,13 @@ class DownloadTask {
             extension: stringUtils.getFileExtensionFromUrl(tweet?.media?.video?.src),
           });
         }
-        const task = new DownloadTask(tweet.tweetId, tweet.userHandle, tweet.datetime, mediaFiles);
+        const task = new DownloadTask(
+          tweet.tweetId,
+          tweet.userHandle,
+          tweet.url,
+          tweet.datetime,
+          mediaFiles
+        );
         result.push(task);
       });
     }

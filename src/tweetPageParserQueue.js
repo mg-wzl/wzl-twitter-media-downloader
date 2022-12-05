@@ -100,6 +100,7 @@ const startTask = async (task) => {
       new downloadManager.DownloadTask(
         apiResult[0].tweetId,
         apiResult[0].userHandle,
+        apiResult[0].url,
         apiResult[0].datetime,
         apiResult[0].mediaFiles
       )
@@ -122,6 +123,7 @@ const onTweetPageLoadedHandler = (event, parsedTweet) => {
     new downloadManager.DownloadTask(
       parsedTweet.tweetId,
       parsedTweet.userHandle,
+      parsedTweet.url,
       parsedTweet.datetime,
       parsedTweet.mediaFiles
     )

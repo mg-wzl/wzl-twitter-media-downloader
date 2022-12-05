@@ -106,7 +106,11 @@ const setupHandlers = () => {
       const downloadTasks = downloadManager.DownloadTask.fromParsedTweetsList(tweetsList);
       console.log('Converted DownloadTasks:', downloadTasks.length);
       for (const task of downloadTasks) {
-        await downloadManager.runDownloads(task);
+        if (!downloadManager.isInFinishedDownloads(task.tweetId)) {
+          await downloadManager.runDownloads(task);
+        } else {
+          uiLogger.info(`Skipped (already dowloaded): ${task.url}`, true);
+        }
       }
       uiLogger.info('Finished downloading media', true);
       downloadManager.finish();
