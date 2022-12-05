@@ -12,24 +12,24 @@ const FileType = {
 
 const readTweetsListFile = (path) => {
   let rawdata = fs.readFileSync(path);
-  let favesList = [];
+  let tweetsList = [];
   let fileType = FileType.UNKNOWN;
   try {
-    const favesObj = JSON.parse(rawdata);
+    const tweetsObj = JSON.parse(rawdata);
 
     // detect file type
-    if (!!favesObj?.[0]?.like && !!favesObj?.[0].like.expandedUrl) {
+    if (!!tweetsObj?.[0]?.like && !!tweetsObj?.[0].like.expandedUrl) {
       fileType = FileType.OFFICIAL;
-    } else if (!!favesObj?.[0]?.mediaType && !!favesObj?.[0]?.url) {
+      tweetsList = tweetsObj.map((v) => v?.like?.expandedUrl);
+    } else if (!!tweetsObj?.[0]?.mediaType && !!tweetsObj?.[0]?.url) {
       fileType = FileType.PARSED;
+      tweetsList = tweetsObj;
     }
-
-    favesList = favesObj.map((v) => v?.like?.expandedUrl);
   } catch (e) {
     console.log('Not a valid JSON file.', e);
   }
 
-  return { favesList, fileType };
+  return { tweetsList, fileType };
 };
 
 const writeJsonFile = (data, targetFolder, fileName) => {

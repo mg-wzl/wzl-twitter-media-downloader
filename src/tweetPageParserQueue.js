@@ -70,6 +70,7 @@ const startNextTaskOrFinishWork = () => {
     ipcMain.removeAllListeners(events.TWEET_FAILED_TO_LOAD);
     ipcMain.removeAllListeners(events.SESSION_GOT_BLOCKED);
     console.log('Finished processing queue');
+    downloadManager.finish();
   }
 };
 

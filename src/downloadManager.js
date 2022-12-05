@@ -36,7 +36,7 @@ class DownloadTask {
         if (tweet?.media?.video?.src) {
           mediaFiles.push({
             url: tweet?.media?.video?.src,
-            extension: stringUtils.getFileExtensionFromUrl(tweet?.media?.video?.srcl),
+            extension: stringUtils.getFileExtensionFromUrl(tweet?.media?.video?.src),
           });
         }
         const task = new DownloadTask(tweet.tweetId, tweet.userHandle, tweet.datetime, mediaFiles);
@@ -52,6 +52,16 @@ const isInFinishedDownloads = (tweetId) => {
     finishedDownloads = fileUtils.readFinishedDownloadsFile(getTargetFolder());
   }
   return finishedDownloads.includes(tweetId) || finishedDownloadsBuffer.includes(tweetId);
+};
+
+const flushFinishedDownloadsBuffer = () => {
+  finishedDownloads.push(...finishedDownloadsBuffer);
+  finishedDownloadsBuffer = [];
+  fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
+};
+
+const finish = () => {
+  flushFinishedDownloadsBuffer();
 };
 
 // TODO; change to supporting array of parsed tweets
@@ -72,9 +82,7 @@ const runDownloads = async (downloadTask) => {
       `#${finishedDownloads.length + finishedDownloadsBuffer.length} Downloaded: ${tweetUrl}`
     );
     if (finishedDownloadsBuffer.length >= MAX_BUFFER_SIZE) {
-      finishedDownloads.push(...finishedDownloadsBuffer);
-      finishedDownloadsBuffer = [];
-      fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
+      flushFinishedDownloadsBuffer();
     }
     // finishedDownloads?.push(parsedTweet.tweetId);
     // fileUtils.rewriteFinishedDownloadsFile(getTargetFolder(), finishedDownloads);
@@ -82,11 +90,12 @@ const runDownloads = async (downloadTask) => {
     uiLogger.error(`Failed to load: ${tweetUrl}`);
     fileUtils.appendFailedDownloadsFile(getTargetFolder(), [tweetUrl]);
   }
-  console.log('Tweet media loaded!');
+  console.log('Tweet media loaded:', tweetUrl);
 };
 
 module.exports = {
   isInFinishedDownloads,
   runDownloads,
+  finish,
   DownloadTask,
 };

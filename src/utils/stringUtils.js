@@ -32,7 +32,7 @@ const scrapedFileNameFromUrl = (urlString) => {
   const dateString = `${now.getFullYear()}${
     now.getMonth() + 1
   }${now.getDate()}-${now.getHours()}${now.getMinutes()}`;
-  return `tweets_${filenameFromTwitterUrl(urlString)}_${dateString}.json`;
+  return `__tweets_${filenameFromTwitterUrl(urlString)}_${dateString}.json`;
 };
 
 const getFileExtensionFromUrl = (url) => {
@@ -43,6 +43,9 @@ const getFileExtensionFromUrl = (url) => {
     const filename = pathParts[pathParts.length - 1];
     const dotIndex = filename.lastIndexOf('.');
     extension = dotIndex > -1 ? filename?.slice(dotIndex + 1) : '';
+  }
+  if (!extension) {
+    extension = fileUrl.searchParams.get('format') || '';
   }
   return extension;
 };

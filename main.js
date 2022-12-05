@@ -14,6 +14,7 @@ const {
 const { readTweetsListFile, FileType } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
+const downloadManager = require('./src/downloadManager');
 
 electronDl();
 
@@ -86,7 +87,7 @@ const setupHandlers = () => {
 
   ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
     console.log(events.DOWNLOAD_FAVES_CLICKED);
-    const { favesList, fileType } = readTweetsListFile(getFavesFilePath());
+    const { tweetsList, fileType } = readTweetsListFile(getFavesFilePath());
     if (fileType === FileType.UNKNOWN) {
       uiLogger.error(`Unknown file format: ${getFavesFilePath()}`, true);
       return;
@@ -94,16 +95,20 @@ const setupHandlers = () => {
     if (fileType === FileType.OFFICIAL) {
       uiLogger.info(`Official Twitter likes file loaded: ${getFavesFilePath()}`, true);
       tweetPageParserQueue.addTasks(
-        tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(favesList)
+        tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(tweetsList)
       );
       tweetPageParserQueue.start();
     }
     if (fileType === FileType.PARSED) {
-      console.log(`Parsed tweets file loaded: ${getFavesFilePath()}`);
+      uiLogger.info(`Parsed tweets file loaded: ${getFavesFilePath()}`, true);
+      const downloadTasks = downloadManager.DownloadTask.fromParsedTweetsList(tweetsList);
+      console.log('Converted DownloadTasks:', downloadTasks.length);
+      for (const task of downloadTasks) {
+        await downloadManager.runDownloads(task);
+      }
+      uiLogger.info('Finished downloading media', true);
+      downloadManager.finish();
     }
-    // console.log('Faves >>>>');
-    // console.log(favesList);
-    // console.log('<<<< Faves');
   });
 };
 

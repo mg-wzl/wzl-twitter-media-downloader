@@ -40,18 +40,18 @@ const parseIsTweetProtected = (tweetContainer) => {
 
 const parseUrlAndDatetime = (tweetContainer) => {
   const timeElement = tweetContainer.querySelector('time');
-  const dateTime = timeElement?.dateTime;
+  const datetime = timeElement?.dateTime;
   const url = timeElement?.closest('a')?.href || '';
 
   const parseResults = parseTweetUrl(url);
   const { tweetId, userHandle } = parseResults || { tweetId: null, userHandle: null };
 
-  return { dateTime, url, tweetId, userHandle };
+  return { datetime, url, tweetId, userHandle };
 };
 
 const parseQuotedTweetUrlAndDatetime = (tweetContainer) => {
   const timeElement = tweetContainer.querySelector('time');
-  const dateTime = timeElement?.dateTime;
+  const datetime = timeElement?.dateTime;
   const photoUrl = tweetContainer.querySelector('a')?.href;
   let url = null;
   if (photoUrl) {
@@ -64,7 +64,7 @@ const parseQuotedTweetUrlAndDatetime = (tweetContainer) => {
   const parseResults = parseTweetUrl(url);
   const { tweetId, userHandle } = parseResults || { tweetId: null, userHandle: null };
 
-  return { dateTime, url, tweetId, userHandle };
+  return { datetime, url, tweetId, userHandle };
 };
 
 const parseImages = (tweetContainer, quoted) => {
@@ -121,7 +121,7 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
     mediaType = TYPE_YOUTUBE;
   }
 
-  const { url, tweetId, dateTime, userHandle } = !quoted
+  const { url, tweetId, datetime, userHandle } = !quoted
     ? parseUrlAndDatetime(tweetContainer)
     : parseQuotedTweetUrlAndDatetime(tweetContainer);
   const { avatar } = parseUserAvatar(tweetContainer);
@@ -131,7 +131,7 @@ const parseTweet = (tweetContainer, mediaContainer, quoted) => {
     userHandle,
     tweetId,
     url,
-    dateTime,
+    datetime,
     avatar,
     text: tweetText.text,
     card,
