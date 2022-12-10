@@ -15,6 +15,7 @@ const { readTweetsListFile, FileType } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
 const downloadManager = require('./src/downloadManager');
+const { scrapedFileNameFromUrl } = require('./src/utils/stringUtils');
 
 electronDl();
 
@@ -27,9 +28,12 @@ contextMenu({
       visible: browserWindow?.id === windowManager?.getWebWindow()?.id,
       click: () => {
         const webWindow = windowManager?.getWebWindow();
+        const url = webWindow?.webContents?.getURL();
+        const targetFileName = scrapedFileNameFromUrl(url);
         webWindow?.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, {
           targetFolder: getTargetFolder(),
-          url: webWindow?.webContents?.getURL(),
+          url,
+          targetFileName,
         });
       },
     },
