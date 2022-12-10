@@ -19,6 +19,8 @@ ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {
   }
 });
 
+// TODO: the idea is to create separate listener which will continue scraping on search page and will APPEND data to the file at the end
+
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   if (pageLoadingWorker) {
     // already in progress, don't initiate it until stopped
