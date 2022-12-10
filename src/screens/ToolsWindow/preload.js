@@ -15,8 +15,11 @@ contextBridge.exposeInMainWorld('on', {
   clearLogClicked: () => {
     document.getElementById('logContainer').innerHTML = '';
   },
-  downloadFavesClicked: () => {
-    return ipcRenderer.invoke(events.DOWNLOAD_FAVES_CLICKED);
+  downloadFromDirectLinksClicked: () => {
+    return ipcRenderer.invoke(events.DOWNLOAD_FROM_DIRECT_LINKS_CLICKED);
+  },
+  parseTweetByTweetAndDownload: () => {
+    return ipcRenderer.invoke(events.PARSE_TWEET_BY_TWEET_AND_DOWNLOAD_CLICKED);
   },
   twitterLoginClicked: () => {
     return ipcRenderer.invoke(events.OPEN_TWITTER_WINDOW_CLICKED);

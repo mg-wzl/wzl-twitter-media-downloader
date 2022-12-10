@@ -24,6 +24,16 @@ class TweetPageTask {
     }
     return result;
   };
+
+  static fromParsedTweetsList = (tweetsList) => {
+    const result = [];
+    if (Array.isArray(tweetsList)) {
+      tweetsList.forEach((tweet, index) => {
+        if (tweet?.url) result.push(new TweetPageTask(tweet?.url));
+      });
+    }
+    return result;
+  };
 }
 
 const STATUSES = {

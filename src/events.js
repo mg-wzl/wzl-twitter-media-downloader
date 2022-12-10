@@ -2,7 +2,8 @@ module.exports = Object.freeze({
   PICK_TARGET_FOLDER_CLICKED: 'button:pickTargetFolderClicked',
   PICK_FAVES_FILE_CLICKED: 'button:pickFavesFileClicked',
   CLEAR_COOKIES_CLICKED: 'button:clearCookieClicked',
-  DOWNLOAD_FAVES_CLICKED: 'button:downloadFavesClicked',
+  DOWNLOAD_FROM_DIRECT_LINKS_CLICKED: 'button:downloadFromDirectLinksClicked',
+  PARSE_TWEET_BY_TWEET_AND_DOWNLOAD_CLICKED: 'button:parseTweetByTweetAndDownloadClicked',
   OPEN_TWITTER_WINDOW_CLICKED: 'button:twitterLoginClicked',
 
   CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED: 'contextMenu:scrollAndScrape',

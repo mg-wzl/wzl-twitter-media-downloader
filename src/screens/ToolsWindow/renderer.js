@@ -26,6 +26,10 @@ document.querySelector('#openTwitterButton').addEventListener('click', () => {
   window.on.twitterLoginClicked();
 });
 
-document.querySelector('#downloadFavesButton').addEventListener('click', () => {
-  window.on.downloadFavesClicked();
+document.querySelector('#downloadFromDirectLinks').addEventListener('click', () => {
+  window.on.downloadFromDirectLinksClicked();
+});
+
+document.querySelector('#parseTweetsFromListAndDownload').addEventListener('click', () => {
+  window.on.parseTweetByTweetAndDownload();
 });

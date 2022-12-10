@@ -87,8 +87,8 @@ const setupHandlers = () => {
     windowManager.openWebWindow();
   });
 
-  ipcMain.handle(events.DOWNLOAD_FAVES_CLICKED, async () => {
-    console.log(events.DOWNLOAD_FAVES_CLICKED);
+  ipcMain.handle(events.DOWNLOAD_FROM_DIRECT_LINKS_CLICKED, async () => {
+    console.log(events.DOWNLOAD_FROM_DIRECT_LINKS_CLICKED);
     const { tweetsList, fileType } = readTweetsListFile(getFavesFilePath());
     if (fileType === FileType.UNKNOWN) {
       uiLogger.error(`Unknown file format: ${getFavesFilePath()}`, true);
@@ -96,10 +96,10 @@ const setupHandlers = () => {
     }
     if (fileType === FileType.OFFICIAL) {
       uiLogger.info(`Official Twitter likes file loaded: ${getFavesFilePath()}`, true);
-      tweetPageParserQueue.addTasks(
-        tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(tweetsList)
+      uiLogger.error(
+        `Official Twitter likes file can't be used for direct links downlad. Please use "Scan tweet by tweet" command`,
+        true
       );
-      tweetPageParserQueue.start();
     }
     if (fileType === FileType.PARSED) {
       uiLogger.info(`Parsed tweets file loaded: ${getFavesFilePath()}`, true);
@@ -114,6 +114,29 @@ const setupHandlers = () => {
       }
       uiLogger.info('Finished downloading media', true);
       downloadManager.finish();
+    }
+  });
+
+  ipcMain.handle(events.PARSE_TWEET_BY_TWEET_AND_DOWNLOAD_CLICKED, async () => {
+    console.log(events.PARSE_TWEET_BY_TWEET_AND_DOWNLOAD_CLICKED);
+    const { tweetsList, fileType } = readTweetsListFile(getFavesFilePath());
+    if (fileType === FileType.UNKNOWN) {
+      uiLogger.error(`Unknown file format: ${getFavesFilePath()}`, true);
+      return;
+    }
+    if (fileType === FileType.OFFICIAL) {
+      uiLogger.info(`Official Twitter likes file loaded: ${getFavesFilePath()}`, true);
+      tweetPageParserQueue.addTasks(
+        tweetPageParserQueue.TweetPageTask.fromOfficialLikesList(tweetsList)
+      );
+      tweetPageParserQueue.start();
+    }
+    if (fileType === FileType.PARSED) {
+      uiLogger.info(`Parsed tweets file loaded: ${getFavesFilePath()}`, true);
+      tweetPageParserQueue.addTasks(
+        tweetPageParserQueue.TweetPageTask.fromParsedTweetsList(tweetsList)
+      );
+      tweetPageParserQueue.start();
     }
   });
 };
