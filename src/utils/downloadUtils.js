@@ -29,7 +29,9 @@ const getFileName = (tweetContent, image, index) => {
   const date = tweetContent.datetime ? new Date(tweetContent.datetime) : null;
   fileName += `_${tweetContent.tweetId}`;
   if (date) {
-    fileName += `_${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
+    fileName += `_${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(
+      date.getDate()
+    ).padStart(2, '0')}`;
   }
   if (tweetContent.origName) {
     fileName += `_${tweetContent.origName}`;

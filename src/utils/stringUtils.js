@@ -29,9 +29,9 @@ const filenameFromTwitterUrl = (urlString) => {
 
 const scrapedFileNameFromUrl = (urlString) => {
   const now = new Date();
-  const dateString = `${now.getFullYear()}${
-    now.getMonth() + 1
-  }${now.getDate()}-${now.getHours()}${now.getMinutes()}`;
+  const dateString = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(
+    now.getDate()
+  ).padStart(2, '0')}-${now.getHours()}${now.getMinutes()}`;
   return `__tweets_${filenameFromTwitterUrl(urlString)}_${dateString}.json`;
 };
 
