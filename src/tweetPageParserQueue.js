@@ -10,9 +10,10 @@ const downloadManager = require('./downloadManager');
 const windowManager = require('./windowManager');
 
 class TweetPageTask {
-  constructor(url, isProtected) {
+  constructor(url, isProtected, mediaType) {
     this.url = url;
     this.isProtected = isProtected || null;
+    this.mediaType = mediaType || null;
     const parsed = parseTweetUrl(url);
     this.tweetId = parsed?.tweetId || '';
   }
@@ -29,7 +30,8 @@ class TweetPageTask {
     const result = [];
     if (Array.isArray(tweetsList)) {
       tweetsList.forEach((tweet, index) => {
-        if (tweet?.url) result.push(new TweetPageTask(tweet?.url));
+        if (tweet?.url)
+          result.push(new TweetPageTask(tweet?.url, tweet?.isProtected, tweet?.mediaType));
       });
     }
     return result;
@@ -50,6 +52,19 @@ const addTasks = (tweetPageTasks) => {
   }
 };
 
+// TODO: handle protected
+const canStartTask = (task) => {
+  if (!task?.tweetId) {
+    console.log('Cannot run empty task:', task);
+    return false;
+  }
+  if (task?.mediaType === 'youtube') {
+    console.log('Cannot run youtube task:', task);
+    return false;
+  }
+  return true;
+};
+
 const getNextTask = () => {
   if (queue?.length === 0) {
     return null;
@@ -58,9 +73,9 @@ const getNextTask = () => {
   let nextTask;
   while (!nextTask && queue?.length > 0) {
     const temp = queue.shift();
-    if (temp?.tweetId) {
+    if (canStartTask(temp)) {
       if (downloadManager.isInFinishedDownloads(temp.tweetId)) {
-        console.log('Skipping task:', temp);
+        console.log('Skipping finished task:', temp);
       } else {
         nextTask = temp;
       }
@@ -95,16 +110,19 @@ const startTask = async (task) => {
   console.log('start task', { task });
   // FIRST we need to try external api. This way we can avoid parsing, which is HUGE
   // const parsedTask = parseTweetUrl(task);
-  const apiResult = await tweetApiHelper
-    .fetchTweetContent(task.tweetId)
-    .catch((e) =>
-      console.log(
-        'Could not get tweet content from API:',
-        e?.response?.status,
-        e?.response?.statusText
-      )
-    );
-  console.log('API RESULT!!!', { apiResult, mediaFiles: apiResult?.[0].mediaFiles });
+  let apiResult;
+  if (!task?.isProtected) {
+    apiResult = await tweetApiHelper
+      .fetchTweetContent(task.tweetId)
+      .catch((e) =>
+        console.log(
+          'Could not get tweet content from API:',
+          e?.response?.status,
+          e?.response?.statusText
+        )
+      );
+    console.log('API RESULT!!!', { apiResult, mediaFiles: apiResult?.[0].mediaFiles });
+  }
   if (apiResult?.length) {
     download(
       new downloadManager.DownloadTask(
