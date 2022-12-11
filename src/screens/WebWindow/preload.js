@@ -2,11 +2,7 @@ const { ipcRenderer } = require('electron');
 const events = require('../../events');
 const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
-const {
-  parseComplexTweet,
-  getDateOfTheLastTweetOnPage,
-} = require('../../parsers/inFeedTweetParser');
-const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
+const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
 const uiLogger = require('../../utils/uiLogger');
 const { PageLoadingWorker } = require('../../PageLoadingWorker');
 
@@ -17,8 +13,6 @@ ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {
     pageLoadingWorker.finish();
   }
 });
-
-// TODO: the idea is to create separate listener which will continue scraping on search page and will APPEND data to the file at the end
 
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   if (pageLoadingWorker) {
@@ -71,8 +65,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   };
 
   const onFinished = () => {
-    let lastTweetDate = getDateOfTheLastTweetOnPage(document);
-
     console.log(
       `Colected ${linksArray.lengthFinished} links in ${
         (new Date().getTime() - startTime) / 1000
@@ -85,7 +77,6 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
       targetFolder,
       url,
       targetFileName,
-      lastTweetDate,
     });
   };
 

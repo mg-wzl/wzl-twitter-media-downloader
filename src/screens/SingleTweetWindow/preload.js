@@ -1,9 +1,6 @@
 const { ipcRenderer } = require('electron');
 const events = require('../../events');
-const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
-const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
-const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const { ANONYMOUS_WINDOW_ARG } = require('../../windowManager');
 const { Titlebar, Color } = require('custom-electron-titlebar');
 

@@ -9,7 +9,6 @@ module.exports = Object.freeze({
   CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED: 'contextMenu:scrollAndScrape',
   CONTEXT_MENU_STOP_SCRAPING: 'contextMenu:stopScraping',
   FEED_PAGE_END_REACHED: 'webWindow:feedPageEndReached',
-  CONTINUE_SCRAPING_ON_SEARCH_PAGE: 'webWindow:continueScrapingOnSearchPage',
 
   WAIT_FOR_TWEET_PAGE_LOAD: 'waitForTweetPageLoad',
   TWEET_PAGE_LOADED: 'tweetPageLoaded',

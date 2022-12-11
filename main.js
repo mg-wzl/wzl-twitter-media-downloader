@@ -1,4 +1,5 @@
 const { app, dialog, ipcMain, session } = require('electron');
+const path = require('path');
 
 const contextMenu = require('electron-context-menu');
 const electronDl = require('electron-dl');
@@ -146,25 +147,9 @@ const setupHandlers = () => {
 
   ipcMain.handle(events.FEED_PAGE_END_REACHED, (event, args) => {
     console.log(events.FEED_PAGE_END_REACHED);
-    const { targetFolder, url, targetFileName, lastTweetDate } = args;
-    let userHandle;
-
-    if (url) {
-      const currentUrl = new URL(url);
-      const pathParts = currentUrl.pathname.split('/').filter(Boolean);
-      if (
-        (pathParts.length === 1 && pathParts[0] !== 'search') ||
-        (pathParts.length === 2 && pathParts[1] === 'media')
-      ) {
-        // if there's only one path part - assuming it's the username
-        // if 2 and the last one is "media" - we're on media page
-        userHandle = pathParts[0];
-      }
-    }
-    console.log(`Reached the end of the page: ${url} ${userHandle} ${lastTweetDate}`);
-    if (userHandle) {
-      // try to search for more tweets in search
-    }
+    const { targetFolder, url, targetFileName } = args;
+    uiLogger.success(`Reached the end of the page: ${url}`, true);
+    uiLogger.success(`File with scan results: ${path.join(targetFolder, targetFileName)}`, true);
   });
 };
 
