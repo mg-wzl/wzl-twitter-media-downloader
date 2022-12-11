@@ -3,7 +3,6 @@ const events = require('../../events');
 const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
 const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
-const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const uiLogger = require('../../utils/uiLogger');
 const { PageLoadingWorker } = require('../../PageLoadingWorker');
 
@@ -21,7 +20,7 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
     return;
   }
   console.log('preload:', events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, { args });
-  const { targetFolder, url } = args;
+  const { targetFolder, url, targetFileName } = args;
   const startTime = new Date().getTime();
   const SCROLL_INTERVAL = 600;
   const NEW_MUTATIONS_TIMEOUT = 5000;
@@ -72,8 +71,13 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
       } seconds`
     );
     console.log('Total links scraped:', linksArray.length);
-    writeJsonFile(linksArray, targetFolder, scrapedFileNameFromUrl(url));
+    writeJsonFile(linksArray, targetFolder, targetFileName);
     pageLoadingWorker = null;
+    ipcRenderer.send(events.FEED_PAGE_END_REACHED, {
+      targetFolder,
+      url,
+      targetFileName,
+    });
   };
 
   pageLoadingWorker = new PageLoadingWorker(

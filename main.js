@@ -1,4 +1,5 @@
 const { app, dialog, ipcMain, session } = require('electron');
+const path = require('path');
 
 const contextMenu = require('electron-context-menu');
 const electronDl = require('electron-dl');
@@ -15,6 +16,7 @@ const { readTweetsListFile, FileType } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
 const downloadManager = require('./src/downloadManager');
+const { scrapedFileNameFromUrl } = require('./src/utils/stringUtils');
 
 electronDl();
 
@@ -27,9 +29,12 @@ contextMenu({
       visible: browserWindow?.id === windowManager?.getWebWindow()?.id,
       click: () => {
         const webWindow = windowManager?.getWebWindow();
+        const url = webWindow?.webContents?.getURL();
+        const targetFileName = scrapedFileNameFromUrl(url);
         webWindow?.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, {
           targetFolder: getTargetFolder(),
-          url: webWindow?.webContents?.getURL(),
+          url,
+          targetFileName,
         });
       },
     },
@@ -138,6 +143,13 @@ const setupHandlers = () => {
       );
       tweetPageParserQueue.start();
     }
+  });
+
+  ipcMain.handle(events.FEED_PAGE_END_REACHED, (event, args) => {
+    console.log(events.FEED_PAGE_END_REACHED);
+    const { targetFolder, url, targetFileName } = args;
+    uiLogger.success(`Reached the end of the page: ${url}`, true);
+    uiLogger.success(`File with scan results: ${path.join(targetFolder, targetFileName)}`, true);
   });
 };
 

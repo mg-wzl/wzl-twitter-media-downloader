@@ -175,4 +175,12 @@ const parseComplexTweet = (tweetContainer) => {
   return [mainTweetParsed, quotedTweetParsed].filter((v) => !!v);
 };
 
-module.exports = { parseComplexTweet };
+const getDateOfTheLastTweetOnPage = (document) => {
+  if (!document) {
+    return null;
+  }
+  const timeElements = [...document.querySelectorAll('[data-testid="tweet"] time')];
+  return new Date(timeElements?.[timeElements?.length - 1]?.dateTime);
+};
+
+module.exports = { parseComplexTweet, getDateOfTheLastTweetOnPage };
