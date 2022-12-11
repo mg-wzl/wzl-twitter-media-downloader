@@ -56,10 +56,12 @@ const addTasks = (tweetPageTasks) => {
 const canStartTask = (task) => {
   if (!task?.tweetId) {
     console.log('Cannot run empty task:', task);
+    uiLogger.info(`Skipping task (no id): ${task?.url}`);
     return false;
   }
   if (task?.mediaType === 'youtube') {
     console.log('Cannot run youtube task:', task);
+    uiLogger.info(`Skipping (youtube): ${task?.url}`);
     return false;
   }
   return true;
@@ -76,6 +78,7 @@ const getNextTask = () => {
     if (canStartTask(temp)) {
       if (downloadManager.isInFinishedDownloads(temp.tweetId)) {
         console.log('Skipping finished task:', temp);
+        uiLogger.info(`Skipping (finished): ${temp?.url}`);
       } else {
         nextTask = temp;
       }
