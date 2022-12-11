@@ -15,6 +15,7 @@ const { readTweetsListFile, FileType } = require('./src/utils/fileUtils');
 const uiLogger = require('./src/utils/uiLogger');
 const windowManager = require('./src/windowManager');
 const downloadManager = require('./src/downloadManager');
+const { scrapedFileNameFromUrl } = require('./src/utils/stringUtils');
 
 electronDl();
 
@@ -27,9 +28,12 @@ contextMenu({
       visible: browserWindow?.id === windowManager?.getWebWindow()?.id,
       click: () => {
         const webWindow = windowManager?.getWebWindow();
+        const url = webWindow?.webContents?.getURL();
+        const targetFileName = scrapedFileNameFromUrl(url);
         webWindow?.send(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, {
           targetFolder: getTargetFolder(),
-          url: webWindow?.webContents?.getURL(),
+          url,
+          targetFileName,
         });
       },
     },
@@ -137,6 +141,29 @@ const setupHandlers = () => {
         tweetPageParserQueue.TweetPageTask.fromParsedTweetsList(tweetsList)
       );
       tweetPageParserQueue.start();
+    }
+  });
+
+  ipcMain.handle(events.FEED_PAGE_END_REACHED, (event, args) => {
+    console.log(events.FEED_PAGE_END_REACHED);
+    const { targetFolder, url, targetFileName, lastTweetDate } = args;
+    let userHandle;
+
+    if (url) {
+      const currentUrl = new URL(url);
+      const pathParts = currentUrl.pathname.split('/').filter(Boolean);
+      if (
+        (pathParts.length === 1 && pathParts[0] !== 'search') ||
+        (pathParts.length === 2 && pathParts[1] === 'media')
+      ) {
+        // if there's only one path part - assuming it's the username
+        // if 2 and the last one is "media" - we're on media page
+        userHandle = pathParts[0];
+      }
+    }
+    console.log(`Reached the end of the page: ${url} ${userHandle} ${lastTweetDate}`);
+    if (userHandle) {
+      // try to search for more tweets in search
     }
   });
 };

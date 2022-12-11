@@ -2,7 +2,10 @@ const { ipcRenderer } = require('electron');
 const events = require('../../events');
 const { writeJsonFile } = require('../../utils/fileUtils');
 const parser = require('../../parsers/tweetPageParser');
-const { parseComplexTweet } = require('../../parsers/inFeedTweetParser');
+const {
+  parseComplexTweet,
+  getDateOfTheLastTweetOnPage,
+} = require('../../parsers/inFeedTweetParser');
 const { scrapedFileNameFromUrl, parseTweetUrl } = require('../../utils/stringUtils');
 const uiLogger = require('../../utils/uiLogger');
 const { PageLoadingWorker } = require('../../PageLoadingWorker');
@@ -15,13 +18,15 @@ ipcRenderer.on(events.CONTEXT_MENU_STOP_SCRAPING, (event, args) => {
   }
 });
 
+// TODO: the idea is to create separate listener which will continue scraping on search page and will APPEND data to the file at the end
+
 ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   if (pageLoadingWorker) {
     // already in progress, don't initiate it until stopped
     return;
   }
   console.log('preload:', events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, { args });
-  const { targetFolder, url } = args;
+  const { targetFolder, url, targetFileName } = args;
   const startTime = new Date().getTime();
   const SCROLL_INTERVAL = 600;
   const NEW_MUTATIONS_TIMEOUT = 5000;
@@ -66,14 +71,22 @@ ipcRenderer.on(events.CONTEXT_MENU_SCROLL_AND_SCRAPE_CLICKED, (event, args) => {
   };
 
   const onFinished = () => {
+    let lastTweetDate = getDateOfTheLastTweetOnPage(document);
+
     console.log(
       `Colected ${linksArray.lengthFinished} links in ${
         (new Date().getTime() - startTime) / 1000
       } seconds`
     );
     console.log('Total links scraped:', linksArray.length);
-    writeJsonFile(linksArray, targetFolder, scrapedFileNameFromUrl(url));
+    writeJsonFile(linksArray, targetFolder, targetFileName);
     pageLoadingWorker = null;
+    ipcRenderer.send(events.FEED_PAGE_END_REACHED, {
+      targetFolder,
+      url,
+      targetFileName,
+      lastTweetDate,
+    });
   };
 
   pageLoadingWorker = new PageLoadingWorker(
